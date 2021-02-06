@@ -23,6 +23,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Reservation_API.Extensions;
 
 namespace Reservation_API
 {
@@ -79,31 +80,25 @@ namespace Reservation_API
                         IssuerSigningKey = 
                             new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings:SecurityKey").Value))
                     };
-                });
+                });                 
 
-            // services.AddMvc().AddJsonOptions(o => 
-            // {
-            //     o.JsonSerializerOptions..ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            // });;
+            services.AddMvc(mvcOptions =>
+            {
+                var authorizationPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                mvcOptions.Filters.Add(new AuthorizeFilter(authorizationPolicy));
+            });                   
 
-            // services.AddAuthorization(options =>
-            // {
-            //     options.AddPolicy(Constants.PolicyNameAdmin, policyBuilder => { policyBuilder.RequireRole(Constants.RoleNameAdmin); });
-            //     options.AddPolicy(Constants.PolicyNameOnlyWatch, policyBuilder => { policyBuilder.RequireRole(Constants.RoleNameAdmin, Constants.RoleNameNormalUser, Constants.RoleNamePainter); });
-            //     options.AddPolicy(Constants.PolicyNameUploadingDownloading, policyBuilder => { policyBuilder.RequireRole(Constants.RoleNameAdmin, Constants.RoleNamePainter); });
-            // });
-
-            services.AddControllers(mvcOptions =>
-                {
-                    var authorizationPolicy = 
-                        new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-
-                    mvcOptions.Filters.Add(new AuthorizeFilter(authorizationPolicy));
-                });
+            services.AddControllers();
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Reservation_API", Version = "v1" });
+            });
+
+            //add policies
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Constants.PolicyNameAdmin, policyBuilder => { policyBuilder.RequireRole(Constants.RoleNameAdmin); });
             });
         }
 

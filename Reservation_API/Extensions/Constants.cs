@@ -2,6 +2,10 @@
 {
     public class Constants
     {        
-        public const string RoleNameAdmin = "Admin";        
+        //roles
+        public const string RoleNameAdmin = "Admin";     
+
+        //policies
+        public const string PolicyNameAdmin = "PolicyAdmin";   
     }
 }
