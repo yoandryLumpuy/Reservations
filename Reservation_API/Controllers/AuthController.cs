@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Reservation_API.Extensions;
 
-namespace Galeria_API.Controllers
+namespace Reservation_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

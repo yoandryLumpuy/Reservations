@@ -1,0 +1,13 @@
+.fill-space {   
+    flex: 1 1 auto;
+  }
+
+  mat-form-field, button{
+    margin-right: 2rem;
+  }
+
+  mat-toolbar{
+    height: 7rem;
+    background-color: lightblue;
+    color: green;
+  }

@@ -34,8 +34,8 @@ namespace Reservation_API.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost]
         [Authorize(Policy = Constants.PolicyNameAdmin)]
+        [HttpPost]        
         public async Task<IActionResult> PostReservation([FromBody]ReservationForModificationsDto reservationForModificationsDto)
 
         {
@@ -51,10 +51,9 @@ namespace Reservation_API.Controllers
 
             return Ok(reservationDto);
         }
-
-        [AllowAnonymous]
+              
+        [Authorize(Policy = Constants.PolicyNameAdmin)]
         [HttpGet(Name = "GetReservations")]
-        [Authorize(Policy = Constants.RoleNameAdmin)]
         public async Task<IActionResult> GetReservations([FromQuery]QueryObject queryObject)
         {
             var invokingUserId = int.Parse(User.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
@@ -71,6 +70,22 @@ namespace Reservation_API.Controllers
                 }));
             return Ok(mapping);
         }        
+                
+        [Authorize(Policy = Constants.PolicyNameAdmin)]
+        [HttpGet("{reservationId}", Name = "GetReservation")]
+        public async Task<IActionResult> GetReservation(int reservationId)
+        {
+            var invokingUserId = int.Parse(User.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+            var reservationFromDbContext =  await _repository.GetReservationAsync(reservationId);
+            if (reservationFromDbContext == null)  return BadRequest($"The reservation {reservationId} doesn't exist");
+
+            var mapping = _mapper.Map<Reservation, ReservationDto>(reservationFromDbContext, 
+                opt => opt.AfterMap(async (source, target) =>
+                {
+                    target.YouLikeIt = await _repository.YouLikeReservationAsync(invokingUserId, target.Id);
+                }));
+            return Ok(mapping);
+        }       
 
         [Authorize(Policy = Constants.PolicyNameAdmin)]
         [HttpPost("{reservationId}/favorite", Name = "ModifyFavorites")]

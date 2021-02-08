@@ -17,7 +17,7 @@ namespace Reservation_API.Persistence
         { }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(builder);            
             builder.ApplyConfiguration(new ContactTypeConfiguration());
             builder.ApplyConfiguration(new ContactConfiguration());
             builder.ApplyConfiguration(new UserRoleConfiguration());

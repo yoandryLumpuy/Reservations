@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Reservation_API.DataTransferObjects
 {
     public class ContactForModificationsDto
-    {
+    {        
         [Required]
         public string ContactName { get; set; }
         

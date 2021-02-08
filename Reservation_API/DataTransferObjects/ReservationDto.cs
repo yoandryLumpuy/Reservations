@@ -11,5 +11,6 @@ namespace Reservation_API.DataTransferObjects
         public ContactDto Contact {get; set;}
         public UserForListDto CreatedByUser { get; set; }
         public bool YouLikeIt { get; set; }
+        public int Ranking { get; set; }
     }
 }

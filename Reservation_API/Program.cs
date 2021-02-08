@@ -29,7 +29,7 @@ namespace Reservation_API
                     var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
                     var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
                     dbContext.Database.Migrate();
-                    ExtensionMethods.SeedUsers(userManager, roleManager);
+                    ExtensionMethods.SeedUsers(userManager, roleManager, dbContext);
                 }
                 catch (Exception ex)
                 {

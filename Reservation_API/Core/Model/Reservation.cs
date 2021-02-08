@@ -16,5 +16,9 @@ namespace Reservation_API.Core.Model{
         public DateTime CreatedDateTime { get; set; }
         
         public virtual ICollection<UserLikesReservation> UserLikesReservation { get; set; }
+
+        public Reservation(){
+            UserLikesReservation = new List<UserLikesReservation>();
+        }
     }
 }

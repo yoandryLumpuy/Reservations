@@ -1,0 +1,57 @@
+  
+    <mat-toolbar> 
+      <span> Gallery </span>
+      <mat-menu #menu="matMenu">        
+        <button mat-menu-item>
+          <mat-icon>account_circled</mat-icon>
+          <span>Edit Profile</span>
+        </button>
+        <button mat-menu-item >
+          <mat-icon>people</mat-icon>
+          <span>Manage Users</span>
+        </button>
+        <button mat-menu-item (click) = "logout()">
+          <mat-icon >logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>  
+      <span class="fill-space"></span>
+      
+      <form *ngIf="!(authService.user | async)" (ngSubmit) = "login()">        
+        <mat-form-field 
+         appearance="outline">
+            <mat-label> User Name </mat-label>
+            <input matInput 
+              required
+              name = "userName"
+              [(ngModel)] = "model.userName"
+              required placeholder="User Name"
+              value="">
+            <mat-hint> Type the user </mat-hint>
+            <mat-error> The user is required </mat-error>
+        </mat-form-field>
+
+        <mat-form-field 
+         appearance="outline">
+            <mat-label> Password </mat-label>
+            <input matInput 
+              required 
+              name = "password"
+              [(ngModel)] = "model.password" 
+              type="password"
+              value="">  
+            <mat-hint> Type a strong password </mat-hint>        
+            <mat-error> Password is required </mat-error>
+        </mat-form-field>
+
+        <button mat-raised-button type="submit" > Login </button>
+        <button mat-raised-button type="button" (click) = "register()"> Register </button>
+      </form>
+      <span *ngIf="!!(authService.user | async)"> Welcome {{(authService.user | async)?.userName}} </span>
+
+      <button mat-icon-button [matMenuTriggerFor] = "menu" class="flex-box">
+        <mat-icon>more_vert</mat-icon>
+      </button>      
+    </mat-toolbar>  
+
+    

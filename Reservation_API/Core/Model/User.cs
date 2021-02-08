@@ -9,6 +9,12 @@ namespace Reservation_API.Core.Model
         public virtual ICollection<UserRole> UserRoles { get; set; }
         public virtual ICollection<Reservation> Reservations { get; set; }
         public virtual ICollection<UserLikesReservation> UserLikesReservation { get; set; }
+
+        public User(){
+            UserRoles = new List<UserRole>();
+            Reservations = new List<Reservation>();
+            UserLikesReservation = new List<UserLikesReservation>();
+        }
         
     }
 }

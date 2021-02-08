@@ -24,6 +24,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Reservation_API.Extensions;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 
 namespace Reservation_API
 {
@@ -39,10 +41,12 @@ namespace Reservation_API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
             services.AddDbContext<ReservationDbContext>(dbContextOptionsBuilder =>
             {
-                dbContextOptionsBuilder.UseLazyLoadingProxies(); 
-                dbContextOptionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                dbContextOptionsBuilder.UseLazyLoadingProxies();
+                dbContextOptionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+                    .ReplaceService<IQueryTranslationPostprocessorFactory, SqlServer2008QueryTranslationPostprocessorFactory>();
             });
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -80,26 +84,55 @@ namespace Reservation_API
                         IssuerSigningKey = 
                             new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings:SecurityKey").Value))
                     };
-                });                 
-
+                });   
+           
             services.AddMvc(mvcOptions =>
             {
                 var authorizationPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                 mvcOptions.Filters.Add(new AuthorizeFilter(authorizationPolicy));
-            });                   
-
-            services.AddControllers();
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Reservation_API", Version = "v1" });
-            });
+            });            
 
             //add policies
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(Constants.PolicyNameAdmin, policyBuilder => { policyBuilder.RequireRole(Constants.RoleNameAdmin); });
             });
+
+            // services.AddSwaggerGen(swagger =>  
+            // {  
+            //     //This is to generate the Default UI of Swagger Documentation    
+            //     swagger.SwaggerDoc("v1", new OpenApiInfo  
+            //     {  
+            //         Version = "v1",  
+            //         Title = "ASP.NET 5 Web API",  
+            //         Description = "Authentication and Authorization in ASP.NET 5 with JWT and Swagger"  
+            //     });  
+            //     // To Enable authorization using Swagger (JWT)    
+            //     swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()  
+            //     {  
+            //         Name = "Authorization",  
+            //         Type = SecuritySchemeType.ApiKey,  
+            //         Scheme = "Bearer",  
+            //         BearerFormat = "JWT",  
+            //         In = ParameterLocation.Header,  
+            //         Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",  
+            //     });  
+            //     swagger.AddSecurityRequirement(new OpenApiSecurityRequirement  
+            //     {  
+            //         {  
+            //               new OpenApiSecurityScheme  
+            //                 {  
+            //                     Reference = new OpenApiReference  
+            //                     {  
+            //                         Type = ReferenceType.SecurityScheme,  
+            //                         Id = "Bearer"  
+            //                     }  
+            //                 },  
+            //                 new string[] {}  
+  
+            //         }  
+            //     });  
+            // });              
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,20 +140,25 @@ namespace Reservation_API
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Reservation_API v1"));
+                app.UseDeveloperExceptionPage();                
             }
+
+            // app.UseSwagger();  
+            // app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ASP.NET 5 Web API v1"));    
 
             //app.UseHttpsRedirection();
             app.UseCors(corsPolicyBuilder => corsPolicyBuilder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-            app.UseRouting();
+            app.UseRouting();  
 
-            //app.UseAuthorization();
+            app.UseAuthentication();          
+            app.UseAuthorization();
 
+            app.UseDefaultFiles();
+            app.UseStaticFiles();            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapFallbackToController("Index", "Fallback");
             });
         }
     }

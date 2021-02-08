@@ -16,4 +16,8 @@ public class Contact
     public int ContactTypeId { get; set; }
 
     public virtual ICollection<Reservation> Reservations { get; set; }
+
+    public Contact(){
+        Reservations = new List<Reservation>();
+    }
 }

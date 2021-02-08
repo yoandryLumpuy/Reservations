@@ -14,5 +14,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.2"/>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.2"/>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2"/>
+    <PackageReference Include="EfCore.SqlServer2008Query" Version="1.0.4"/>
   </ItemGroup>
 </Project>

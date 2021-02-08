@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Reservation_API.Core.Model;
 using Reservation_API.DataTransferObjects;
 using Reservation_API.Core;
+using AutoMapper;
 
 namespace Reservation_API.Persistence
 {
@@ -17,13 +18,15 @@ namespace Reservation_API.Persistence
         private readonly ReservationDbContext _reservationDbContext;
         private readonly UserManager<User> _userManager;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
         public Repository(ReservationDbContext reservationDbContext, UserManager<User> userManager,
-                  IUnitOfWork unitOfWork)
+                  IUnitOfWork unitOfWork, IMapper mapper)
         {
             _reservationDbContext = reservationDbContext;
             _userManager = userManager;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }  
 
         public async Task<User> GetUserAsync(int id)
@@ -33,6 +36,11 @@ namespace Reservation_API.Persistence
         public async Task<Reservation> GetReservationAsync(int id)
         {
             return await _reservationDbContext.Reservations.SingleOrDefaultAsync(res => res.Id == id);
+        }
+
+        public async Task<Contact> GetContactAsync(int id)
+        {
+            return await _reservationDbContext.Contacts.SingleOrDefaultAsync(contact => contact.Id == id);
         }
          
         public async Task<PaginationResult<Contact>> GetContactsAsync(QueryObject queryObject)
@@ -46,11 +54,11 @@ namespace Reservation_API.Persistence
                 ["ContactType"] = contact => contact.ContactType.Name
             };
 
-            if (dictionary.ContainsKey(queryObject.SortBy))
+            if (queryObject?.SortBy != null && dictionary.ContainsKey(queryObject.SortBy))
             {
                 query = queryObject.IsSortAscending                 
-                        ? query.OrderBy(res => dictionary[queryObject.SortBy]) 
-                        : query.OrderByDescending(res => dictionary[queryObject.SortBy]);            
+                        ? query.OrderBy(dictionary[queryObject.SortBy]) 
+                        : query.OrderByDescending(dictionary[queryObject.SortBy]);            
             }    
 
             return await PaginationResult<Contact>.CreateAsync(query, queryObject.Page, queryObject.PageSize);
@@ -58,19 +66,14 @@ namespace Reservation_API.Persistence
 
         public async Task<Contact> GetOrCreateContactByNameAsync(ContactForModificationsDto contactForModificationsDto)
         {
-            var contact = await _reservationDbContext.Contacts.SingleOrDefaultAsync(contact => 
-                  string.Compare(contact.Name, contactForModificationsDto.ContactName, StringComparison.OrdinalIgnoreCase) == 0);
+            var contact = await _reservationDbContext.Contacts.SingleOrDefaultAsync(
+                contact => contact.Name.ToLower() == contactForModificationsDto.ContactName.ToLower());
             if (contact != null)  return contact;
 
-            contact = new Contact{
-                Name = contactForModificationsDto.ContactName,
-                BirthDate = contactForModificationsDto.BirthDate.Value,
-                Phone = contactForModificationsDto.Phone,
-                ContactTypeId = contactForModificationsDto.ContactTypeId.Value
-            };
+            contact = _mapper.Map<ContactForModificationsDto, Contact>(contactForModificationsDto);
             
-            await _reservationDbContext.Contacts.AddAsync(contact);
-            await _unitOfWork.CompleteAsync();                  
+            await _reservationDbContext.Contacts.AddAsync(contact);            
+            await _unitOfWork.CompleteAsync();                                   
             return contact;
         }
 
@@ -88,7 +91,7 @@ namespace Reservation_API.Persistence
                 ["ContactName"] = reservation => reservation.Contact.Name
             };
 
-            if (dictionary.ContainsKey(queryObject.SortBy))
+            if (queryObject?.SortBy != null && dictionary.ContainsKey(queryObject.SortBy))
             {
                 query = queryObject.IsSortAscending                 
                         ? query.OrderBy(res => dictionary[queryObject.SortBy]) 
@@ -131,22 +134,20 @@ namespace Reservation_API.Persistence
 
         public async Task<Reservation> CreateReservationAsync(int invokingUserId, ReservationForModificationsDto reservationForModificationsDto)
         {
-            var contact = this.GetOrCreateContactByNameAsync(new ContactForModificationsDto{
-                ContactName = reservationForModificationsDto.ContactName,
-                Phone = reservationForModificationsDto.Phone,
-                BirthDate = reservationForModificationsDto.BirthDate,
-                ContactTypeId = reservationForModificationsDto.ContactTypeId
-            });
+            var contact = await this.GetOrCreateContactByNameAsync(
+                _mapper.Map<ReservationForModificationsDto, ContactForModificationsDto>(reservationForModificationsDto));
 
             var reservation = new Reservation{
                 ContactId = contact.Id,
                 CreatedByUserId = invokingUserId,
-                CreatedDateTime = DateTime.Now
+                CreatedDateTime = DateTime.Now                
             };
             
             await _reservationDbContext.Reservations.AddAsync(reservation);
             await _unitOfWork.CompleteAsync();
             return reservation;
         }
+
+        
     }
 }
