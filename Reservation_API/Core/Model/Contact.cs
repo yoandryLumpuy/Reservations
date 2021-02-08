@@ -12,10 +12,10 @@ public class Contact
 
     public DateTime BirthDate { get; set; }
 
-    public virtual ContactType ContactType { get; set; }
+    public ContactType ContactType { get; set; }
     public int ContactTypeId { get; set; }
 
-    public virtual ICollection<Reservation> Reservations { get; set; }
+    public ICollection<Reservation> Reservations { get; set; }
 
     public Contact(){
         Reservations = new List<Reservation>();

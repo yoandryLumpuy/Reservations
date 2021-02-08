@@ -35,17 +35,23 @@ namespace Reservation_API.Persistence
         } 
         public async Task<Reservation> GetReservationAsync(int id)
         {
-            return await _reservationDbContext.Reservations.SingleOrDefaultAsync(res => res.Id == id);
+            return await _reservationDbContext.Reservations
+                      .Include(res => res.CreatedByUser)
+                      .Include(res => res.Contact).ThenInclude(c => c.ContactType)
+                      .SingleOrDefaultAsync(res => res.Id == id);
         }
 
         public async Task<Contact> GetContactAsync(int id)
-        {
-            return await _reservationDbContext.Contacts.SingleOrDefaultAsync(contact => contact.Id == id);
+        {            
+            return await _reservationDbContext.Contacts
+                    .Include(contact => contact.ContactType)
+                    .SingleOrDefaultAsync(contact => contact.Id == id);
         }
          
         public async Task<PaginationResult<Contact>> GetContactsAsync(QueryObject queryObject)
         {
-            var query = _reservationDbContext.Contacts.AsQueryable();
+            var query = _reservationDbContext.Contacts
+                            .Include(c => c.ContactType).AsQueryable();
 
             var dictionary = new Dictionary<string, Expression<Func<Contact, object>>>(){               
                 ["ContactName"] = contact => contact.Name,
@@ -59,27 +65,33 @@ namespace Reservation_API.Persistence
                 query = queryObject.IsSortAscending                 
                         ? query.OrderBy(dictionary[queryObject.SortBy]) 
                         : query.OrderByDescending(dictionary[queryObject.SortBy]);            
-            }    
+            }     
 
             return await PaginationResult<Contact>.CreateAsync(query, queryObject.Page, queryObject.PageSize);
         }
 
         public async Task<Contact> GetOrCreateContactByNameAsync(ContactForModificationsDto contactForModificationsDto)
         {
-            var contact = await _reservationDbContext.Contacts.SingleOrDefaultAsync(
-                contact => contact.Name.ToLower() == contactForModificationsDto.ContactName.ToLower());
+            var contact = await _reservationDbContext.Contacts
+                .Include(c => c.ContactType)
+                .SingleOrDefaultAsync( 
+                    contact => contact.Name.ToLower() == contactForModificationsDto.ContactName.ToLower());
+
             if (contact != null)  return contact;
 
             contact = _mapper.Map<ContactForModificationsDto, Contact>(contactForModificationsDto);
             
             await _reservationDbContext.Contacts.AddAsync(contact);            
-            await _unitOfWork.CompleteAsync();                                   
-            return contact;
+            await _unitOfWork.CompleteAsync();                               
+            return await GetContactAsync(contact.Id);
         }
 
         public async Task<PaginationResult<Reservation>> GetReservationsAsync(QueryObject queryObject)
         {
-            var query = _reservationDbContext.Reservations.AsQueryable();
+            var query = _reservationDbContext.Reservations
+                            .Include(res => res.CreatedByUser)
+                            .Include(res => res.Contact).ThenInclude(c => c.ContactType)
+                            .AsQueryable();
 
             if (queryObject.UserId.HasValue)
             {
@@ -145,9 +157,7 @@ namespace Reservation_API.Persistence
             
             await _reservationDbContext.Reservations.AddAsync(reservation);
             await _unitOfWork.CompleteAsync();
-            return reservation;
-        }
-
-        
+            return await GetReservationAsync(reservation.Id);
+        }        
     }
 }
