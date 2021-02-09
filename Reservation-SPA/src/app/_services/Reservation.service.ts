@@ -4,7 +4,7 @@ import { PaginationResult } from '../_model/paginationResult.interface';
 import { QueryObject } from '../_model/queryObject.interface';
 import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AlertService } from './alert.service';
 import { Router } from '@angular/router';
@@ -38,7 +38,7 @@ export class ReservationService {
     if (!this.authService.loggedIn) {
       this.router.navigate(['/']);
       this.alertService.error("Please log in!");
-      return null;
+      return of();
     };
     return this.http.post<Reservation>(`${environment.baseUrl}reservations/${reservationId}/favorite`, {});
   }

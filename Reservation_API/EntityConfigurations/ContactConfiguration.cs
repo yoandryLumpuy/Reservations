@@ -10,18 +10,16 @@ namespace Reservation_API.EntityConfigurations
         public void Configure(EntityTypeBuilder<Contact> builder)
         {
             builder.Property(contact => contact.Name)
-              .IsRequired();
+              .IsRequired()
+              .HasMaxLength(255);
 
-            builder.Property(contact => contact.Phone)
+            builder.Property(contact => contact.BirthDate)
                 .IsRequired();
 
-            builder.Property(contact => contact.Phone)
-                .IsRequired();  
-
             builder.HasOne(cont => cont.ContactType)
-            .WithMany(contType => contType.Contacts)
-            .HasForeignKey(cont => cont.ContactTypeId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(contType => contType.Contacts)
+                .HasForeignKey(cont => cont.ContactTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }    
 }

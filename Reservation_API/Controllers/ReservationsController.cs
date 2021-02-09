@@ -39,9 +39,17 @@ namespace Reservation_API.Controllers
         public async Task<IActionResult> PostReservation([FromBody]ReservationForModificationsDto reservationForModificationsDto)
 
         {
-            var invokingUserId = int.Parse(User.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier).Value); 
+            var invokingUserId = int.Parse(User.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+
+            //trying to update an existing reservation            
+            if (reservationForModificationsDto.Id != 0) {
+                var res = await _repository.GetReservationAsync(reservationForModificationsDto.Id);
+                if (res == null) return BadRequest("The reservation you're trying to update doesn't exist");
+                if (res.CreatedByUserId != invokingUserId) 
+                    return BadRequest("You're not the owner of this reservation, so you can't modify it!");
+            }
             
-            var reservation = await _repository.CreateReservationAsync(invokingUserId, reservationForModificationsDto);
+            var reservation = await _repository.CreateOrUpdateReservationAsync(invokingUserId, reservationForModificationsDto);
                         
             var reservationDto = _mapper.Map<Reservation, ReservationDto>(reservation, 
                 opt => opt.AfterMap(async (source, target) =>

@@ -38,6 +38,7 @@ namespace Reservation_API.Persistence
             return await _reservationDbContext.Reservations
                       .Include(res => res.CreatedByUser)
                       .Include(res => res.Contact).ThenInclude(c => c.ContactType)
+                      .Include(res => res.UserLikesReservation)
                       .SingleOrDefaultAsync(res => res.Id == id);
         }
 
@@ -70,18 +71,20 @@ namespace Reservation_API.Persistence
             return await PaginationResult<Contact>.CreateAsync(query, queryObject.Page, queryObject.PageSize);
         }
 
-        public async Task<Contact> GetOrCreateContactByNameAsync(ContactForModificationsDto contactForModificationsDto)
+        public async Task<Contact> CreateOrUpdateContactByNameAsync(ContactForModificationsDto contactForModificationsDto)
         {
             var contact = await _reservationDbContext.Contacts
                 .Include(c => c.ContactType)
                 .SingleOrDefaultAsync( 
                     contact => contact.Name.ToLower() == contactForModificationsDto.ContactName.ToLower());
 
-            if (contact != null)  return contact;
+            var toAdd = contact == null;
+            if (!toAdd)  
+                _mapper.Map<ContactForModificationsDto, Contact>(contactForModificationsDto, contact);
+            else  
+                contact = _mapper.Map<ContactForModificationsDto, Contact>(contactForModificationsDto);
 
-            contact = _mapper.Map<ContactForModificationsDto, Contact>(contactForModificationsDto);
-            
-            await _reservationDbContext.Contacts.AddAsync(contact);            
+            if (toAdd) await _reservationDbContext.Contacts.AddAsync(contact);            
             await _unitOfWork.CompleteAsync();                               
             return await GetContactAsync(contact.Id);
         }
@@ -91,6 +94,7 @@ namespace Reservation_API.Persistence
             var query = _reservationDbContext.Reservations
                             .Include(res => res.CreatedByUser)
                             .Include(res => res.Contact).ThenInclude(c => c.ContactType)
+                            .Include(res => res.UserLikesReservation)
                             .AsQueryable();
 
             if (queryObject.UserId.HasValue)
@@ -144,20 +148,56 @@ namespace Reservation_API.Persistence
             }
         }
 
-        public async Task<Reservation> CreateReservationAsync(int invokingUserId, ReservationForModificationsDto reservationForModificationsDto)
+        public async Task<Reservation> CreateOrUpdateReservationAsync(int invokingUserId, ReservationForModificationsDto reservationForModificationsDto)
         {
-            var contact = await this.GetOrCreateContactByNameAsync(
+            var contact = await this.CreateOrUpdateContactByNameAsync(
                 _mapper.Map<ReservationForModificationsDto, ContactForModificationsDto>(reservationForModificationsDto));
 
-            var reservation = new Reservation{
-                ContactId = contact.Id,
-                CreatedByUserId = invokingUserId,
-                CreatedDateTime = DateTime.Now                
-            };
+            var toAdd = reservationForModificationsDto.Id == 0;
+
+            Reservation reservation;
+            if (toAdd)
+                reservation = new Reservation{
+                    ContactId = contact.Id,
+                    CreatedByUserId = invokingUserId,
+                    CreatedDateTime = DateTime.Now                
+                };
+            else {
+                reservation = await this.GetReservationAsync(reservationForModificationsDto.Id);
+                reservation.ContactId = contact.Id;
+                reservation.CreatedDateTime = DateTime.Now;
+            }                
             
-            await _reservationDbContext.Reservations.AddAsync(reservation);
+            if (toAdd) await _reservationDbContext.Reservations.AddAsync(reservation);
             await _unitOfWork.CompleteAsync();
             return await GetReservationAsync(reservation.Id);
-        }        
+        }
+
+        public async Task<List<Contact>> GetAllContactsAsync()
+        {
+            var allContacts = await _reservationDbContext.Contacts
+                .Include(c => c.ContactType)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            return allContacts;
+        }
+
+        public async Task<List<ContactType>> GetAllContactTypesAsync()
+        {
+            return await _reservationDbContext.ContactTypes.ToListAsync();
+        }
+
+        public async Task<bool> DeleteContactAsync(int contactId)
+        {
+            var contact = await GetContactAsync(contactId);
+            if (contact != null) {
+                _reservationDbContext.Contacts.Remove(contact);
+                await _unitOfWork.CompleteAsync();
+                return true;
+            }
+
+            return false;
+        }
     }
 }

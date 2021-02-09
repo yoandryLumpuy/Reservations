@@ -13,6 +13,8 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatGridListModule} from '@angular/material/grid-list';
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatSelectModule } from "@angular/material/select";
+import {  MatDatepickerModule } from "@angular/material/datepicker";
 
 @NgModule({
   exports:[
@@ -29,7 +31,9 @@ import { MatAutocompleteModule } from "@angular/material/autocomplete";
     MatFormFieldModule,
     MatTooltipModule,
     MatGridListModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatSelectModule,
+    MatDatepickerModule
   ]
 })
 export class MatModule { }

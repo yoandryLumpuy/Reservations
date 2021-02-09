@@ -8,7 +8,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
   providedIn: 'root'
 })
 export class AlertService {
-private duration : number = 2000;
+private duration : number = 5000;
 
 constructor(private snackBar : MatSnackBar, private matDialog : MatDialog) { }
 

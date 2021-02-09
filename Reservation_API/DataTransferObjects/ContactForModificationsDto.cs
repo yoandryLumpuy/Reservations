@@ -10,8 +10,10 @@ namespace Reservation_API.DataTransferObjects
         
         public string Phone { get; set; }
 
+        [Required]
         public DateTime BirthDate { get; set; }
 
+        [Required]
         public int ContactTypeId { get; set; } 
     }
 }

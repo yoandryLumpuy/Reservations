@@ -13,6 +13,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { AppComponent } from './app.component';
 import { NavBarComponent } from './_components/navBar/navBar.component';
+import { FlexLayoutModule } from "@angular/flex-layout";
 import { UserWithRolesDirective } from './_directives/userWithRoles.directive';
 import { appRoutingModule } from './app-routing.module';
 import { AuthInterceptorService } from './_services/authInterceptor.service';
@@ -23,6 +24,8 @@ import { MAT_SNACK_BAR_DATA, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/mate
 import { UploadProgressInterceptorService } from './_services/upload-progress-interceptor.service';
 import { EditReservationComponent } from './_components/edit-reservation/edit-reservation.component';
 import { EditContactComponent } from './_components/edit-contact/edit-contact.component';
+import { LoginComponent } from './_components/login/login.component';
+
 
 @NgModule({
   declarations: [				
@@ -36,7 +39,8 @@ import { EditContactComponent } from './_components/edit-contact/edit-contact.co
       ToolbarComponent,
       ReservationListComponent,
       EditReservationComponent,
-      EditContactComponent
+      EditContactComponent,
+      LoginComponent
    ],
   imports: [
     BrowserModule, 
@@ -46,7 +50,8 @@ import { EditContactComponent } from './_components/edit-contact/edit-contact.co
     BrowserAnimationsModule,
     appRoutingModule,
     MatModule, 
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FlexLayoutModule
   ],
   providers: [
     // {provide: ErrorHandler, useClass: MyErrorHandler},

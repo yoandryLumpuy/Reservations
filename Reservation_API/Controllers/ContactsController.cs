@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Reservation_API.Extensions;
 using Reservation_API.Persistence;
 using Reservation_API.Core;
+using System.Collections.Generic;
 
 namespace Reservation_API.Controllers
 {
@@ -23,14 +24,11 @@ namespace Reservation_API.Controllers
     public class ContactsController : ControllerBase
     {
         private readonly IRepository _repository;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public ContactsController(IRepository repository, 
-            IUnitOfWork unitOfWork, IMapper mapper)
+        public ContactsController(IRepository repository, IMapper mapper)
         {
             _repository = repository;
-            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
@@ -41,7 +39,7 @@ namespace Reservation_API.Controllers
         {
             var invokingUserId = int.Parse(User.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier).Value); 
             
-            var contact = await _repository.GetOrCreateContactByNameAsync(contactForModificationsDto);
+            var contact = await _repository.CreateOrUpdateContactByNameAsync(contactForModificationsDto);
                         
             var contactDto = _mapper.Map<Contact, ContactDto>(contact);
 
@@ -68,6 +66,34 @@ namespace Reservation_API.Controllers
 
             var mapping = _mapper.Map<Contact, ContactDto>(contactFromDbContext);
             return Ok(mapping);
-        }   
+        }  
+
+        [Authorize(Policy = Constants.PolicyNameAdmin)]
+        [HttpGet("all", Name = "GetAllContacts")]
+        public async Task<IActionResult> GetAllContacts()
+        {
+            var contactsFromDbContext =  await _repository.GetAllContactsAsync();
+            var mapping = _mapper.Map<List<Contact>, List<ContactDto>>(contactsFromDbContext);
+            return Ok(mapping);
+        }  
+
+        [Authorize(Policy = Constants.PolicyNameAdmin)]
+        [HttpGet("contacttypes", Name = "GetAllContactTypes")]
+        public async Task<IActionResult> GetAllContactTypes()
+        {
+            var contactTypesFromDbContext =  await _repository.GetAllContactTypesAsync();
+            var mapping = _mapper.Map<List<ContactType>, List<ContactTypeDto>>(contactTypesFromDbContext);
+            return Ok(mapping);
+        }
+
+        [Authorize(Policy = Constants.PolicyNameAdmin)]
+        [HttpDelete("{contactId}", Name = "DeleteContact")]
+        public async Task<IActionResult> DeleteContact(int contactId)
+        {
+            var successfullyDeleted =  await _repository.DeleteContactAsync(contactId);
+            if (!successfullyDeleted) return BadRequest("Contact not found!");
+            
+            return Ok(contactId);
+        }
     }
 }
