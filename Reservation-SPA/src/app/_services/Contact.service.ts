@@ -43,7 +43,11 @@ export class ContactService {
       return this.http.post<Contact>(`${environment.baseUrl}contacts`, contactForModifications);
     }
 
-    getContact(id: number){
+    getContactById(id: number){
       return this.http.get<Contact>(`${environment.baseUrl}contacts/${id}`);
+    }
+
+    getContactByName(contactName : string){
+      return this.http.get<Contact>(`${environment.baseUrl}contacts/byname/${contactName}`);
     }
 }

@@ -71,7 +71,19 @@ namespace Reservation_API.Controllers
 
             var mapping = _mapper.Map<Contact, ContactDto>(contactFromDbContext);
             return Ok(mapping);
-        }  
+        }
+
+        [HttpGet("byname/{contactName}", Name = "GetContactByName")]
+        [Authorize(Policy = Constants.PolicyNameAdmin)]
+        public async Task<IActionResult> GetContactByName(string contactName)
+        {
+            var invokingUserId = int.Parse(User.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+            var contactFromDbContext =  await _repository.GetContactByNameAsync(contactName);
+            if (contactFromDbContext == null) return BadRequest($"The Contact {contactName} doesn't exist!");
+
+            var mapping = _mapper.Map<Contact, ContactDto>(contactFromDbContext);
+            return Ok(mapping);
+        }    
 
         [Authorize(Policy = Constants.PolicyNameAdmin)]
         [HttpGet("all", Name = "GetAllContacts")]

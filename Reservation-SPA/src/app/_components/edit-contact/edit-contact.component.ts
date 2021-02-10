@@ -1,12 +1,13 @@
-import { map, switchMap } from 'rxjs/operators';
+import { User } from './../../_model/user.interface';
+import { AuthService } from './../../_services/auth.service';
+import { Contact } from './../../_model/Contact.interface';
+import { catchError, switchMap } from 'rxjs/operators';
 import { ContactType } from './../../_model/ContactType.interface';
 import { ContactService } from './../../_services/Contact.service';
-import { observable, Observable, Subscription } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { PhonePattern } from './../../_model/Constants';
-import { validateVerticalPosition } from '@angular/cdk/overlay';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Contact } from 'src/app/_model/Contact.interface';
+import { AbstractControl, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { AlertService } from 'src/app/_services/alert.service';
 import { forkJoin } from 'rxjs';
 import {  ActivatedRoute, Router } from '@angular/router';
@@ -18,13 +19,16 @@ import { ContactForModifications } from 'src/app/_model/ContactForModifications.
   styleUrls: ['./edit-contact.component.css']
 })
 export class EditContactComponent implements OnInit, OnDestroy {
-  contacts: Contact[] = [];
   contactTypes: ContactType[] = [];
-  subscription : Subscription; 
+  subscriptionLoadData : Subscription; 
+  subscriptionFillForm : Subscription;
 
   model: ContactForModifications;
   isEditing = false; 
-  contactId: any;
+  contactId: any = 0;
+  disableContactEdition = false; 
+
+  contact: Contact;
 
   form = new FormGroup({
     contactName: new FormControl('', Validators.required),    
@@ -33,8 +37,10 @@ export class EditContactComponent implements OnInit, OnDestroy {
     birthDate: new FormControl('', Validators.required)
   });
 
-  constructor(private contactService : ContactService, private alertService : AlertService,
-    private router : Router, private  route : ActivatedRoute) {         
+  constructor(private contactService : ContactService, 
+    private alertService : AlertService,
+    private router : Router, private  route : ActivatedRoute,
+    private authService : AuthService) {         
   } 
 
   get contactName(){
@@ -54,44 +60,68 @@ export class EditContactComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) this.subscription.unsubscribe();
+    if (this.subscriptionLoadData) this.subscriptionLoadData.unsubscribe();
+    if (this.subscriptionFillForm) this.subscriptionFillForm.unsubscribe();
   }
 
   ngOnInit() { 
-    forkJoin([
-      this.contactService.getAllContacts(),
+     this.loadData(); 
+     this.fillForm();      
+  }
+
+  loadData(){
+    if (this.subscriptionLoadData) this.subscriptionLoadData.unsubscribe();
+    this.subscriptionLoadData = 
       this.contactService.getAllContactTypes()
-    ])
-    .subscribe(data => {
-      this.contacts = data[0];
-      this.contactTypes = data[1]; 
-    }, 
-    error => {
-      if (error.status == 404)
-        {
-            this.alertService.error("There was an error retrieving data!");
-            this.router.navigate(['']);
-        }
-    });  
-    
-    this.subscription  = this.route.paramMap.pipe(
+      .subscribe(ct => {
+        this.contactTypes = ct; 
+      }, 
+      error => {
+        if (error.status == 404)
+          {
+              this.alertService.error("There was an error retrieving data!");
+              this.router.navigate(['']);
+          }
+      });
+  }
+
+  fillForm(){
+    if (this.subscriptionFillForm) this.subscriptionFillForm.unsubscribe();
+    this.subscriptionFillForm  = this.route.paramMap.pipe(
       switchMap(res =>
         {
            this.isEditing = res.get('id') != null;            
-           if (this.isEditing) this.contactId = res.get('id');  
-           return this.contactService.getContact(parseInt(this.contactId));        
+           if (this.isEditing) 
+            this.contactId = res.get('id'); 
+           else {
+            this.contactName.setAsyncValidators(this.contactAlreadyExist);    
+            this.contactName.updateValueAndValidity();
+           }          
+
+           return this.contactService.getContactById(parseInt(this.contactId));        
         })
       )
-      .subscribe(contact => {
-        if (this.isEditing){          
-          this.form.setValue({
-            contactName: contact.name,    
-            contactTypeId: contact.contactType.id,
-            phone: contact.phone,
-            birthDate: contact.birthDate
-          })
-        }           
-      }); 
+      .subscribe(contact => this.fillContactData(contact),
+      (error) => {});
+  }
+
+  fillContactData(c : Contact){ 
+    //set values in the form
+    this.form.setValue({
+      contactName: c.name,    
+      contactTypeId: c.contactType.id,
+      phone: c.phone,
+      birthDate: c.birthDate
+    })
+  }
+
+  includeContactTypeToSourceLists(c : Contact){ 
+    //update souce list for the mat-select component in contactTypes edition
+    var index = this.contactTypes.findIndex(ct => ct.id == c.contactType.id);    
+    if (index != -1)
+      this.contactTypes.splice(index, 1, c.contactType);
+    else 
+      this.contactTypes.push(c.contactType);
   }
 
   onSubmit(){
@@ -101,4 +131,16 @@ export class EditContactComponent implements OnInit, OnDestroy {
           this.alertService.success(`Contact successfully ${this.isEditing ? 'updated' : 'created'}`);
       });
   }
+
+  contactAlreadyExist(control: AbstractControl): 
+              Promise<ValidationErrors | null> | Observable<ValidationErrors | null>{    
+    return this.contactService.getContactByName(control.value)
+           .pipe(switchMap(c => { 
+              this.includeContactTypeToSourceLists(c);             
+              return of({contactAlreadyExist: true});
+           }),
+           catchError(error => {
+             return of(null);
+           }));
+  }  
 }

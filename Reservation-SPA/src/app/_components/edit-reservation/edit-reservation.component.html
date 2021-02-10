@@ -7,13 +7,15 @@
             matInput
             [formControl] = "contactName"
             [matAutocomplete]="auto"
-            [disabled] = "isEditing">
+            (change) = "onContactNameChange($event)">
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
           <mat-option *ngFor="let option of contacts" [value]="option">
             {{option.name}}
           </mat-option>
-        </mat-autocomplete>  
-        <mat-error *ngIf="contactName.touched && contactName.errors?.required">The User Name is required!</mat-error>
+        </mat-autocomplete> 
+        <div *ngIf="contactName.touched && contactName.errors">
+          <mat-error *ngIf="contactName.errors?.required">The User Name is required!</mat-error>        
+        </div>         
       </mat-form-field>
     </mat-grid-tile>
   
@@ -21,7 +23,8 @@
       <mat-form-field appearance="outline">
         <mat-select         
           aria-placeholder="contact Type"
-          [formControl]="contactTypeId">  
+          [formControl]="contactTypeId"
+          [disabled] = "disableContactEdition">  
           <mat-option [value] = "0"></mat-option>      
           <mat-option *ngFor="let contactType of contactTypes"           
             [value]="contactType.id">{{contactType.name}}</mat-option>
@@ -38,7 +41,8 @@
         <input type="text"
             placeholder="Phone:"
             matInput
-            [formControl] = "phone">
+            [formControl] = "phone"
+            [disabled] = "disableContactEdition">
   
         <div *ngIf="phone.touched && phone.invalid">
           <mat-error *ngIf="phone.errors?.pattern">Phone is invalid. Please follow the pattern!</mat-error> 
@@ -50,7 +54,8 @@
     <mat-grid-tile [colspan]="1" [rowspan]="1">
       <mat-form-field appearance="outline">
         <input matInput [matDatepicker]="dp" 
-          [formControl] = "birthDate">
+          [formControl] = "birthDate"
+          [disabled] = "disableContactEdition">
         <mat-datepicker-toggle matPrefix [for]="dp"></mat-datepicker-toggle>
         <mat-datepicker #dp></mat-datepicker>
       </mat-form-field>
@@ -58,7 +63,7 @@
 
     <mat-grid-tile [colspan]="1" [rowspan]="1">
       <button mat-raised-button type = "submit" [disabled] = "!form.dirty || !form.invalid"
-        > {{isEditing ? 'Update' : 'Insert'}} </button>
+        > {{isEditingReservation ? 'Update' : 'Insert'}} </button>
     </mat-grid-tile>
   </mat-grid-list>    
 </form>

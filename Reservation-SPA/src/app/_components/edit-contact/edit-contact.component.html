@@ -7,14 +7,12 @@
               placeholder="Contact Name ..."
               matInput
               [formControl] = "contactName"
-              [matAutocomplete]="auto"
-              [disabled] = "isEditing">
-          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-            <mat-option *ngFor="let option of contacts" [value]="option">
-              {{option.name}}
-            </mat-option>
-          </mat-autocomplete>  
-          <mat-error *ngIf="contactName.touched && contactName.errors?.required">The User Name is required!</mat-error>
+              [disabled] = "isEditing">  
+          <div *ngIf="contactName.touched && contactName.errors">
+            <mat-error *ngIf="contactName.errors?.required">The User Name is required!</mat-error>
+            <mat-error *ngIf="contactName.errors?.contactAlreadyExist">Contact Name already exist!</mat-error>            
+          </div>
+          
         </mat-form-field>
       </mat-grid-tile>
     
@@ -23,12 +21,12 @@
           <mat-select         
             aria-placeholder="contact Type"
             [formControl]="contactTypeId">  
-            <mat-option [value] = "0"></mat-option>      
+            <mat-option [value] = ""></mat-option>      
             <mat-option *ngFor="let contactType of contactTypes"           
               [value]="contactType.id">{{contactType.name}}</mat-option>
           </mat-select>
           
-          <mat-error *ngIf="contactTypeId.touched && (contactTypeId.invalid || contactTypeId.value == 0)">
+          <mat-error *ngIf="contactTypeId.touched && contactTypeId.invalid">
             The Contact Type is required!
           </mat-error>
         </mat-form-field>
@@ -58,7 +56,7 @@
       </mat-grid-tile>
   
       <mat-grid-tile [colspan]="1" [rowspan]="1">
-        <button mat-raised-button type = "submit" [disabled] = "!form.dirty || !form.invalid"
+        <button mat-raised-button type = "submit" [disabled] = "form.touched && form.invalid"
           > {{isEditing ? 'Update' : 'Insert'}} </button>
       </mat-grid-tile>
     </mat-grid-list>    
