@@ -8,12 +8,14 @@ namespace Reservation_API.Core.Model
     {
         public ICollection<UserRole> UserRoles { get; set; }
         public ICollection<Reservation> Reservations { get; set; }
+        public ICollection<Contact> Contacts { get; set; }
         public ICollection<UserLikesReservation> UserLikesReservation { get; set; }
 
         public User(){
             UserRoles = new List<UserRole>();
             Reservations = new List<Reservation>();
             UserLikesReservation = new List<UserLikesReservation>();
+            Contacts = new List<Contact>();
         }
         
     }

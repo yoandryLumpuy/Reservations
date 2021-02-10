@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Reservation_API.Persistence;
 
 namespace Reservation_API.Migrations
 {
     [DbContext(typeof(ReservationDbContext))]
-    partial class ReservationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210210001922_CreatedUserAddedToTableContacts")]
+    partial class CreatedUserAddedToTableContacts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,8 +175,6 @@ namespace Reservation_API.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ContactId");
 
                     b.HasIndex("CreatedByUserId");
 
@@ -366,7 +366,7 @@ namespace Reservation_API.Migrations
                 {
                     b.HasOne("Contact", "Contact")
                         .WithMany("Reservations")
-                        .HasForeignKey("ContactId")
+                        .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

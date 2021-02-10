@@ -11,5 +11,6 @@ namespace Reservation_API.DataTransferObjects{
         public DateTime BirthDate { get; set; }
 
         public ContactTypeDto ContactType { get; set; }    
+        public UserForListDto CreatedByUser { get; set; }
     }
 }

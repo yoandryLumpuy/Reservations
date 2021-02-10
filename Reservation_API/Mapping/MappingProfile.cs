@@ -10,12 +10,12 @@ namespace Reservation_API.Mapping
         public MappingProfile()
         {
             //from Dtos to Domain Model 
-            CreateMap<UserForListDto, User>();
+            CreateMap<UserForLoginDto, User>();
             CreateMap<ContactForModificationsDto, Contact>()
                 .ForMember(contact => contact.Name, options => options.MapFrom(contactForModificationsDto => contactForModificationsDto.ContactName));
 
             //from Dto to Dto
-            CreateMap<ReservationForModificationsDto, ContactForModificationsDto>();           
+            CreateMap<ReservationForModificationsDto, ContactForModificationsDto>();        
 
             //from Domain Model to Dtos
             CreateMap<Contact, ContactDto>();

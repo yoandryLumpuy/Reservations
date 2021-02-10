@@ -10,6 +10,7 @@ using Reservation_API.Core.Model;
 using Reservation_API.DataTransferObjects;
 using Reservation_API.Core;
 using AutoMapper;
+using Reservation_API.Extensions;
 
 namespace Reservation_API.Persistence
 {
@@ -35,24 +36,19 @@ namespace Reservation_API.Persistence
         } 
         public async Task<Reservation> GetReservationAsync(int id)
         {
-            return await _reservationDbContext.Reservations
-                      .Include(res => res.CreatedByUser)
-                      .Include(res => res.Contact).ThenInclude(c => c.ContactType)
-                      .Include(res => res.UserLikesReservation)
+            return await _reservationDbContext.Reservations.EagerLoadRelatedObjects()
                       .SingleOrDefaultAsync(res => res.Id == id);
         }
 
         public async Task<Contact> GetContactAsync(int id)
         {            
-            return await _reservationDbContext.Contacts
-                    .Include(contact => contact.ContactType)
+            return await _reservationDbContext.Contacts.EagerLoadRelatedObjects()
                     .SingleOrDefaultAsync(contact => contact.Id == id);
         }
          
         public async Task<PaginationResult<Contact>> GetContactsAsync(QueryObject queryObject)
         {
-            var query = _reservationDbContext.Contacts
-                            .Include(c => c.ContactType).AsQueryable();
+            var query = _reservationDbContext.Contacts.EagerLoadRelatedObjects().AsQueryable();
 
             var dictionary = new Dictionary<string, Expression<Func<Contact, object>>>(){               
                 ["ContactName"] = contact => contact.Name,
@@ -71,30 +67,32 @@ namespace Reservation_API.Persistence
             return await PaginationResult<Contact>.CreateAsync(query, queryObject.Page, queryObject.PageSize);
         }
 
-        public async Task<Contact> CreateOrUpdateContactByNameAsync(ContactForModificationsDto contactForModificationsDto)
+        public async Task<Contact> CreateOrUpdateContactByNameAsync(int invokingUserId, ContactForModificationsDto contactForModificationsDto)
         {
-            var contact = await _reservationDbContext.Contacts
-                .Include(c => c.ContactType)
+            var contact = await _reservationDbContext.Contacts.EagerLoadRelatedObjects()
                 .SingleOrDefaultAsync( 
                     contact => contact.Name.ToLower() == contactForModificationsDto.ContactName.ToLower());
 
             var toAdd = contact == null;
-            if (!toAdd)  
+
+            //trying to modify contact and invokingUserId is the creator of this contact then modify properties
+            //if not then use the contact without modifying its properties.
+            if (!toAdd && invokingUserId == contact.CreatedByUserId)  
                 _mapper.Map<ContactForModificationsDto, Contact>(contactForModificationsDto, contact);
-            else  
+            else if (toAdd) 
                 contact = _mapper.Map<ContactForModificationsDto, Contact>(contactForModificationsDto);
 
-            if (toAdd) await _reservationDbContext.Contacts.AddAsync(contact);            
+            if (toAdd) {
+                contact.CreatedByUserId = invokingUserId;
+                await _reservationDbContext.Contacts.AddAsync(contact);            
+            }
             await _unitOfWork.CompleteAsync();                               
             return await GetContactAsync(contact.Id);
         }
 
         public async Task<PaginationResult<Reservation>> GetReservationsAsync(QueryObject queryObject)
         {
-            var query = _reservationDbContext.Reservations
-                            .Include(res => res.CreatedByUser)
-                            .Include(res => res.Contact).ThenInclude(c => c.ContactType)
-                            .Include(res => res.UserLikesReservation)
+            var query = _reservationDbContext.Reservations.EagerLoadRelatedObjects()
                             .AsQueryable();
 
             if (queryObject.UserId.HasValue)
@@ -142,7 +140,7 @@ namespace Reservation_API.Persistence
                 await _unitOfWork.CompleteAsync();
                 return await GetReservationAsync(reservationId);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -150,7 +148,7 @@ namespace Reservation_API.Persistence
 
         public async Task<Reservation> CreateOrUpdateReservationAsync(int invokingUserId, ReservationForModificationsDto reservationForModificationsDto)
         {
-            var contact = await this.CreateOrUpdateContactByNameAsync(
+            var contact = await this.CreateOrUpdateContactByNameAsync(invokingUserId,
                 _mapper.Map<ReservationForModificationsDto, ContactForModificationsDto>(reservationForModificationsDto));
 
             var toAdd = reservationForModificationsDto.Id == 0;
@@ -176,7 +174,7 @@ namespace Reservation_API.Persistence
         public async Task<List<Contact>> GetAllContactsAsync()
         {
             var allContacts = await _reservationDbContext.Contacts
-                .Include(c => c.ContactType)
+                .EagerLoadRelatedObjects()
                 .OrderBy(c => c.Name)
                 .ToListAsync();
 
@@ -198,6 +196,12 @@ namespace Reservation_API.Persistence
             }
 
             return false;
+        }
+
+        public async Task<Contact> GetContactByNameAsync(string contactName)
+        {
+            return await _reservationDbContext.Contacts.EagerLoadRelatedObjects()
+                            .FirstOrDefaultAsync(contact => contact.Name.ToLower() == contactName.ToLower());
         }
     }
 }

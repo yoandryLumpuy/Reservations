@@ -34,14 +34,12 @@ export class ReservationService {
     return parts.join('&');
   }
 
-  modifyFavorite(reservationId: number){
+  modifyFavorite(reservationId: number) : Observable<Reservation>{
     if (!this.authService.loggedIn) {
       this.router.navigate(['/']);
       this.alertService.error("Please log in!");
       return of();
     };
     return this.http.post<Reservation>(`${environment.baseUrl}reservations/${reservationId}/favorite`, {});
-  }
-
-  
+  }  
 }

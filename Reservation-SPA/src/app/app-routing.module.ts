@@ -1,5 +1,4 @@
 import { ReservationListComponent } from './_components/reservation-list/reservation-list.component';
-import { AdminListOfUsersComponent } from './_components/AdminListOfUsers/AdminListOfUsers.component';
 import { AuthGuardService } from './_guards/authGuard.service';
 import { Routes, RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';

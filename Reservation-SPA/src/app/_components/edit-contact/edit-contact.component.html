@@ -1,6 +1,9 @@
 
   <form [formGroup] = "form" (ngSubmit) = "onSubmit()">
-    <mat-form-field appearance="outlined">    
+    <mat-grid-list [cols] = 1 >
+
+    </mat-grid-list>
+    <mat-form-field appearance="outline">    
       <input type="text"
           placeholder="Contact Name ..."
           matInput
@@ -16,7 +19,7 @@
       <mat-error *ngIf="contactName.touched && contactName.errors?.required">The User Name is required!</mat-error>
     </mat-form-field>
   
-    <mat-form-field appearance="outlined">
+    <mat-form-field appearance="outline">
       <mat-select         
         aria-placeholder="contact Type"
         [formControl]="contactTypeId">  
@@ -30,7 +33,7 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outlined">    
+    <mat-form-field appearance="outline">    
       <input type="text"
           placeholder="Phone:"
           matInput
@@ -42,7 +45,7 @@
       </div>
     </mat-form-field >
 
-    <mat-form-field appearance="outlined">
+    <mat-form-field appearance="outline">
       <input matInput [matDatepicker]="dp" 
         [formControl] = "birthDate">
       <mat-datepicker-toggle matPrefix [for]="dp"></mat-datepicker-toggle>

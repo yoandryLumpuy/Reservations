@@ -41,7 +41,7 @@ export class AuthService {
              localStorage.setItem('token', res.token); 
              localStorage.setItem('user', JSON.stringify(res.user));  
              this.user.next(res.user);
-             this.autologout();                         
+             this.configureAutoLogout();                         
             }));
   }
 
@@ -58,7 +58,7 @@ export class AuthService {
     if (!!this.timeoutTimer) clearTimeout(this.timeoutTimer);
   }
 
-  autologout(){
+  configureAutoLogout(){
     var token = localStorage.getItem('token');
     if (!token || !this.helper.getTokenExpirationDate(token) || this.helper.isTokenExpired(token)) 
     {

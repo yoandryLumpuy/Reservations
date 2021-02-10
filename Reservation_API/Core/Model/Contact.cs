@@ -15,6 +15,9 @@ public class Contact
     public ContactType ContactType { get; set; }
     public int ContactTypeId { get; set; }
 
+    public User CreatedByUser { get; set; }
+    public int CreatedByUserId { get; set; }
+
     public ICollection<Reservation> Reservations { get; set; }
 
     public Contact(){

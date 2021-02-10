@@ -39,7 +39,12 @@ namespace Reservation_API.Controllers
         {
             var invokingUserId = int.Parse(User.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier).Value); 
             
-            var contact = await _repository.CreateOrUpdateContactByNameAsync(contactForModificationsDto);
+            //trying to update an existing Contact not created by invokingUserId                    
+            var res = await _repository.GetContactByNameAsync(contactForModificationsDto.ContactName);
+            if (res != null && res.CreatedByUserId != invokingUserId) 
+                return BadRequest("You're trying to modify a Contact not created by you!");
+
+            var contact = await _repository.CreateOrUpdateContactByNameAsync(invokingUserId, contactForModificationsDto);
                         
             var contactDto = _mapper.Map<Contact, ContactDto>(contact);
 

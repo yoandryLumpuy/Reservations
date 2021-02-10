@@ -1,0 +1,43 @@
+<mat-grid-list cols="4" rowHeight="100px">
+  <mat-grid-tile    
+      [colspan]="1"
+      [rowspan]="1">
+      <mat-grid-list cols="1">
+        <mat-grid-tile [colspan]="1" [rowspan]="1"><h3>{{reservation.contact.name}}</h3></mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1"><small>{{reservation.createdDateTime | date:'full'}}</small></mat-grid-tile>
+      </mat-grid-list>
+  </mat-grid-tile>
+
+  <mat-grid-tile      
+      [colspan]="1"
+      [rowspan]="1">
+      <h4>Ranking</h4>
+      <div>
+        <mat-icon 
+          [ngStyle]="{color: reservation.ranking > 1 ? 'yellow' : 'grey'}"></mat-icon>
+        <mat-icon
+          [ngStyle]="{color: reservation.ranking > 2 ? 'yellow' : 'grey'}"></mat-icon>
+        <mat-icon 
+          [ngStyle]="{color: reservation.ranking > 3 ? 'yellow' : 'grey'}"></mat-icon>
+        <mat-icon 
+          [ngStyle]="{color: reservation.ranking > 4 ? 'yellow' : 'grey'}"></mat-icon>
+        <mat-icon 
+          [ngStyle]="{color: reservation.ranking > 5 ? 'yellow' : 'grey'}"></mat-icon>
+      </div>      
+  </mat-grid-tile>
+
+  <mat-grid-tile      
+      [colspan]="1"
+      [rowspan]="1">
+      <div>
+        <mat-icon [ngStyle] = "{color: reservation.youLikeIt ? 'red' : 'grey'}"
+          (click) = modifyFavorite()>favorite_border</mat-icon>
+      </div>
+  </mat-grid-tile>
+
+  <mat-grid-tile      
+      [colspan]="1"
+      [rowspan]="1">
+    <button mat-raised-button *ngIf="userId == reservation.createdByUser.id"></button>
+  </mat-grid-tile>
+</mat-grid-list>

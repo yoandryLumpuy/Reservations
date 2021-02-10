@@ -16,7 +16,7 @@ namespace Reservation_API.EntityConfigurations
 
             builder.HasOne(reservation => reservation.Contact)
                 .WithMany(contact => contact.Reservations)
-                .HasForeignKey(reservation => reservation.CreatedByUserId)
+                .HasForeignKey(reservation => reservation.ContactId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(res => res.CreatedDateTime)
