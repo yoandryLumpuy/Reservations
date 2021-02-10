@@ -83,8 +83,7 @@ export class EditContactComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe(contact => {
-        if (this.isEditing){
-          
+        if (this.isEditing){          
           this.form.setValue({
             contactName: contact.name,    
             contactTypeId: contact.contactType.id,

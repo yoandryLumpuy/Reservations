@@ -1,4 +1,5 @@
-import { Reservation } from '../_model/reservation.interface';
+import { ReservationForModifications } from 'src/app/_model/ReservationForModifications.interface';
+import { Reservation } from './../_model/reservation.interface';
 import { AuthService } from './auth.service';
 import { PaginationResult } from '../_model/paginationResult.interface';
 import { QueryObject } from '../_model/queryObject.interface';
@@ -41,5 +42,13 @@ export class ReservationService {
       return of();
     };
     return this.http.post<Reservation>(`${environment.baseUrl}reservations/${reservationId}/favorite`, {});
+  }
+  
+  postReservation(reservationForModifications : ReservationForModifications){
+    return this.http.post<Reservation>(`${environment.baseUrl}reservations`, reservationForModifications);
+  }
+
+  getReservation(reservationId: number){
+    return this.http.get<Reservation>(`${environment.baseUrl}reservations/${reservationId}`);
   }  
 }

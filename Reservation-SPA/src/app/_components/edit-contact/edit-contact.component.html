@@ -1,57 +1,65 @@
 
   <form [formGroup] = "form" (ngSubmit) = "onSubmit()">
-    <mat-grid-list [cols] = 1 >
-
-    </mat-grid-list>
-    <mat-form-field appearance="outline">    
-      <input type="text"
-          placeholder="Contact Name ..."
-          matInput
-          [formControl] = "contactName"
-          [matAutocomplete]="auto"
-          [disabled] = "isEditing">
-      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-        <mat-option *ngFor="let option of contacts" [value]="option">
-          {{option.name}}
-        </mat-option>
-      </mat-autocomplete>
-
-      <mat-error *ngIf="contactName.touched && contactName.errors?.required">The User Name is required!</mat-error>
-    </mat-form-field>
+    <mat-grid-list cols="1" [rowHeight] = "100">   
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-form-field appearance="outline">    
+          <input type="text"
+              placeholder="Contact Name ..."
+              matInput
+              [formControl] = "contactName"
+              [matAutocomplete]="auto"
+              [disabled] = "isEditing">
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+            <mat-option *ngFor="let option of contacts" [value]="option">
+              {{option.name}}
+            </mat-option>
+          </mat-autocomplete>  
+          <mat-error *ngIf="contactName.touched && contactName.errors?.required">The User Name is required!</mat-error>
+        </mat-form-field>
+      </mat-grid-tile>
+    
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-form-field appearance="outline">
+          <mat-select         
+            aria-placeholder="contact Type"
+            [formControl]="contactTypeId">  
+            <mat-option [value] = "0"></mat-option>      
+            <mat-option *ngFor="let contactType of contactTypes"           
+              [value]="contactType.id">{{contactType.name}}</mat-option>
+          </mat-select>
+          
+          <mat-error *ngIf="contactTypeId.touched && (contactTypeId.invalid || contactTypeId.value == 0)">
+            The Contact Type is required!
+          </mat-error>
+        </mat-form-field>
+      </mat-grid-tile> 
   
-    <mat-form-field appearance="outline">
-      <mat-select         
-        aria-placeholder="contact Type"
-        [formControl]="contactTypeId">  
-        <mat-option [value] = "0"></mat-option>      
-        <mat-option *ngFor="let contactType of contactTypes"           
-          [value]="contactType.id">{{contactType.name}}</mat-option>
-      </mat-select>
-      
-      <mat-error *ngIf="contactTypeId.touched && (contactTypeId.invalid || contactTypeId.value == 0)">
-        The Contact Type is required!
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">    
-      <input type="text"
-          placeholder="Phone:"
-          matInput
-          [formControl] = "phone">
-
-      <div *ngIf="phone.touched && phone.invalid">
-        <mat-error *ngIf="phone.errors?.pattern">Phone is invalid. Please follow the pattern!</mat-error> 
-        <mat-error *ngIf="phone.errors?.required">Phone is required!</mat-error> 
-      </div>
-    </mat-form-field >
-
-    <mat-form-field appearance="outline">
-      <input matInput [matDatepicker]="dp" 
-        [formControl] = "birthDate">
-      <mat-datepicker-toggle matPrefix [for]="dp"></mat-datepicker-toggle>
-      <mat-datepicker #dp></mat-datepicker>
-    </mat-form-field>
-
-    <button mat-raised-button type = "submit" [disabled] = "!form.dirty || !form.invalid"
-      > {{isEditing ? 'Update' : 'Insert'}} </button>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-form-field appearance="outline">    
+          <input type="text"
+              placeholder="Phone:"
+              matInput
+              [formControl] = "phone">
+    
+          <div *ngIf="phone.touched && phone.invalid">
+            <mat-error *ngIf="phone.errors?.pattern">Phone is invalid. Please follow the pattern!</mat-error> 
+            <mat-error *ngIf="phone.errors?.required">Phone is required!</mat-error> 
+          </div>
+        </mat-form-field >
+      </mat-grid-tile>
+  
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-form-field appearance="outline">
+          <input matInput [matDatepicker]="dp" 
+            [formControl] = "birthDate">
+          <mat-datepicker-toggle matPrefix [for]="dp"></mat-datepicker-toggle>
+          <mat-datepicker #dp></mat-datepicker>
+        </mat-form-field>
+      </mat-grid-tile>
+  
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <button mat-raised-button type = "submit" [disabled] = "!form.dirty || !form.invalid"
+          > {{isEditing ? 'Update' : 'Insert'}} </button>
+      </mat-grid-tile>
+    </mat-grid-list>    
   </form>
