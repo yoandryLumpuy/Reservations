@@ -8,6 +8,8 @@ import { AlertService } from './alert.service';
 import { AuthService } from './auth.service';
 import { from, Observable} from "rxjs";
 import { environment } from 'src/environments/environment';
+import { QueryObject } from '../_model/queryObject.interface';
+import { PaginationResult } from '../_model/paginationResult.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -49,5 +51,22 @@ export class ContactService {
 
     getContactByName(contactName : string){
       return this.http.get<Contact>(`${environment.baseUrl}contacts/byname/${contactName}`);
+    }
+
+    getPaginatedContacts(queryObject: QueryObject) : Observable<PaginationResult<Contact>>{              
+      return this.http.get<PaginationResult<Contact>>(environment.baseUrl + "contacts?"+ this.queryObjectToString(queryObject), 
+                  {reportProgress: true});
+    }
+
+    queryObjectToString(queryObject : any) : string{
+      var parts : string[] = [];
+      if (!!queryObject){
+        for(let prop in queryObject){
+          var value = queryObject[prop];
+          if (value != null && value != undefined) 
+            parts.push(encodeURIComponent(prop) + '='+ encodeURIComponent(queryObject[prop]))
+        }
+      }
+      return parts.join('&');
     }
 }

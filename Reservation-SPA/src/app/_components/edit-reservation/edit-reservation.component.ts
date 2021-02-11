@@ -106,7 +106,9 @@ export class EditReservationComponent implements OnInit {
 
   fillContactData(c : Contact){ 
     //set values in the form
+    var values = this.form.value;
     this.form.setValue({
+      ...values,
       contactName: c.name,    
       contactTypeId: c.contactType.id,
       phone: c.phone,
@@ -116,7 +118,9 @@ export class EditReservationComponent implements OnInit {
 
   fillReservationData(r : Reservation){ 
     //set values in the form
+    var values = this.form.value;
     this.form.setValue({
+      ...values,
       contactName: r.contact.name,    
       contactTypeId: r.contact.contactType.id,
       phone: r.contact.phone,
@@ -151,7 +155,7 @@ export class EditReservationComponent implements OnInit {
       .subscribe(c =>{  
         this.includeContactToSourceLists(c);            
         this.fillContactData(c);
-        this.disableContactEdition = user.id !== c.CreatedByUser.id         
+        this.disableContactEdition = user.id !== c.createdByUser.id         
       },
       (error) => {});
   }

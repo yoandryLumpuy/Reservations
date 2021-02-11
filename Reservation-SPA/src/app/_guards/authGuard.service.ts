@@ -21,7 +21,7 @@ export class AuthGuardService implements CanActivate{
       return false;
     }
 
-
+      
     var arrayOfRoles = route.firstChild?.data['roles'] as string[];
     if (!!arrayOfRoles && arrayOfRoles.length > 0){
       var allowedAccess = this.authService.matchRoles(arrayOfRoles);

@@ -7,6 +7,9 @@ import { Reservation } from 'src/app/_model/reservation.interface';
 import { User } from 'src/app/_model/user.interface';
 import { ProgressSpinnerService } from 'src/app/_services/progress-spinner.service';
 
+const SortByContactName : string = "ContactName";
+export const SortByCreatedDateTime : string = "CreatedDateTime";
+
 @Component({
   selector: 'app-reservation-list',
   templateUrl: './reservation-list.component.html',

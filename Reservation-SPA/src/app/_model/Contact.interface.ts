@@ -6,5 +6,5 @@ export interface Contact {
     phone: number;
     birthDate: Date;
     contactType: ContactType;
-    CreatedByUser: User;
+    createdByUser: User;
 }

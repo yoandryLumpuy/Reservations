@@ -51,10 +51,10 @@ namespace Reservation_API.Persistence
             var query = _reservationDbContext.Contacts.EagerLoadRelatedObjects().AsQueryable();
 
             var dictionary = new Dictionary<string, Expression<Func<Contact, object>>>(){               
-                ["ContactName"] = contact => contact.Name,
-                ["Phone"] = contact => contact.Phone,
-                ["BirthDate"] = contact => contact.BirthDate,
-                ["ContactType"] = contact => contact.ContactType.Name
+                [Constants.SortByContactName] = contact => contact.Name,
+                [Constants.SortByPhone] = contact => contact.Phone,
+                [Constants.SortByBirthDate] = contact => contact.BirthDate,
+                [Constants.SortByContactType] = contact => contact.ContactType.Name
             };
 
             if (queryObject?.SortBy != null && dictionary.ContainsKey(queryObject.SortBy))
@@ -101,8 +101,8 @@ namespace Reservation_API.Persistence
             }
 
             var dictionary = new Dictionary<string, Expression<Func<Reservation, object>>>(){
-                ["CreatedDateTime"] = reservation => reservation.CreatedDateTime,
-                ["ContactName"] = reservation => reservation.Contact.Name
+                [Constants.SortByCreatedDateTime] = reservation => reservation.CreatedDateTime,
+                [Constants.SortByContactName] = reservation => reservation.Contact.Name
             };
 
             if (queryObject?.SortBy != null && dictionary.ContainsKey(queryObject.SortBy))

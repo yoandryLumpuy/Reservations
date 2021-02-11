@@ -7,5 +7,11 @@
 
         //policies
         public const string PolicyNameAdmin = "PolicyAdmin";   
+
+        public const string SortByContactName = "ContactName";
+        public const string SortByPhone = "Phone";
+        public const string SortByBirthDate = "BirthDate";
+        public const string SortByContactType = "ContactType";
+        public const string SortByCreatedDateTime = "CreatedDateTime";
     }
 }
