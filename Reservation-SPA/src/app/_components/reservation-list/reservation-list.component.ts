@@ -1,3 +1,6 @@
+import { ReservationService } from 'src/app/_services/Reservation.service';
+import { BreakpointObserverService } from 'src/app/_services/breakpoint-observer.service';
+import { BannerStructureService } from 'src/app/_services/banner-structure.service';
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
@@ -6,37 +9,37 @@ import { defaultQueryObject, QueryObject } from 'src/app/_model/queryObject.inte
 import { Reservation } from 'src/app/_model/reservation.interface';
 import { User } from 'src/app/_model/user.interface';
 import { ProgressSpinnerService } from 'src/app/_services/progress-spinner.service';
+import { defaultBannerStructure } from 'src/app/_model/Constants';
 
-const SortByContactName : string = "ContactName";
-export const SortByCreatedDateTime : string = "CreatedDateTime";
+
 
 @Component({
   selector: 'app-reservation-list',
   templateUrl: './reservation-list.component.html',
   styleUrls: ['./reservation-list.component.css']
 })
-export class ReservationListComponent implements OnInit {
-  availableRoles : string[];
-
-  subscription : Subscription;
-  subscriptionToUsers : Subscription;
+export class ReservationListComponent implements OnInit {  
   subscriptionToProgressSpinner : Subscription;
+  subscriptionToBreakpointObserver: Subscription;
+
+  paginationResult: PaginationResult<Reservation> = defaultPaginationResult; 
+
+  SortByContactName : string = "ContactName";
+  SortByCreatedDateTime : string = "CreatedDateTime";
+
+  inSmallScreen = false;
 
   isLoadingOrUploading = false;
 
-  paginationResult : PaginationResult<Reservation> = defaultPaginationResult;
-  queryObject : QueryObject = defaultQueryObject;  
-  showProgressSpinner = false;
-
-  displayedColumns: string[] = ['contactName', 'userName', 'roles'];
-  dataSource = new MatTableDataSource(this.paginationResult.items);  
-
-  constructor(public progressSpinnerService : ProgressSpinnerService) { }
+  constructor(public progressSpinnerService : ProgressSpinnerService,
+    private bannerStructureService: BannerStructureService,
+    private breakpointObserverService: BreakpointObserverService,
+    private reservationService: ReservationService) { }
 
   ngOnDestroy(): void {
-    if (!!this.subscription) this.subscription.unsubscribe();
-    if (!!this.subscriptionToUsers) this.subscriptionToUsers.unsubscribe();
     if (this.subscriptionToProgressSpinner) this.subscriptionToProgressSpinner.unsubscribe();
+    if (this.subscriptionToBreakpointObserver) 
+      this.subscriptionToBreakpointObserver.unsubscribe();
   }
 
   ngOnInit() {     
@@ -46,10 +49,26 @@ export class ReservationListComponent implements OnInit {
           this.isLoadingOrUploading = !!res && res < 100;
         }
       ); 
-  } 
-  
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
+
+    this.subscriptionToBreakpointObserver 
+      = this.breakpointObserverService.inSmallScreen.subscribe(res => {
+        this.inSmallScreen = res;
+      });
+
+    this.bannerStructureService.updateBanner({
+        ...defaultBannerStructure,
+        leftText: 'Reservations List',
+        middleText : 'Lorem ipsum dolor sit, amet consectetur adipisicing elit.' 
+                      + 'Rem similique doloribus sunt earum commodi ad exercitationem error illum sed nam.',
+        navigationButtonText: 'Reservation List',
+        emittedBy: this
+      }); 
+      
+    this.reservationService.getReservations(defaultQueryObject).subscribe(      
+      res => {
+        console.log(res);
+        this.paginationResult = res;
+      }
+    ); 
+  }  
 }

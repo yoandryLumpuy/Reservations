@@ -52,9 +52,9 @@ namespace Reservation_API.Controllers
             var reservation = await _repository.CreateOrUpdateReservationAsync(invokingUserId, reservationForModificationsDto);
                         
             var reservationDto = _mapper.Map<Reservation, ReservationDto>(reservation, 
-                opt => opt.AfterMap(async (source, target) =>
+                opt => opt.AfterMap((source, target) =>
                 {
-                    target.YouLikeIt = await _repository.YouLikeReservationAsync(invokingUserId, target.Id);
+                    target.YouLikeIt = _repository.YouLikeReservationAsync(invokingUserId, target.Id);
                 }));
 
             return Ok(reservationDto);
@@ -70,9 +70,9 @@ namespace Reservation_API.Controllers
                 opt => opt.AfterMap((source, target) =>
                 {
                     target.Items.ForEach(
-                        async reservationDto =>
+                        reservationDto =>
                         {
-                            reservationDto.YouLikeIt = await _repository.YouLikeReservationAsync(invokingUserId, reservationDto.Id);                            
+                            reservationDto.YouLikeIt = _repository.YouLikeReservationAsync(invokingUserId, reservationDto.Id);                            
                         }
                     );
                 }));
@@ -88,9 +88,9 @@ namespace Reservation_API.Controllers
             if (reservationFromDbContext == null)  return BadRequest($"The reservation {reservationId} doesn't exist");
 
             var mapping = _mapper.Map<Reservation, ReservationDto>(reservationFromDbContext, 
-                opt => opt.AfterMap(async (source, target) =>
+                opt => opt.AfterMap((source, target) =>
                 {
-                    target.YouLikeIt = await _repository.YouLikeReservationAsync(invokingUserId, target.Id);
+                    target.YouLikeIt =  _repository.YouLikeReservationAsync(invokingUserId, target.Id);
                 }));
             return Ok(mapping);
         }       
@@ -108,9 +108,9 @@ namespace Reservation_API.Controllers
             if (pic == null) return BadRequest("Something went wrong when modifying favorites!.");
 
             var pictureDto = _mapper.Map<Reservation, ReservationDto>(pic,
-                opt => opt.AfterMap(async (source, target) =>
+                opt => opt.AfterMap((source, target) =>
                 {
-                    target.YouLikeIt = await _repository.YouLikeReservationAsync(invokingUserId, target.Id);
+                    target.YouLikeIt = _repository.YouLikeReservationAsync(invokingUserId, target.Id);
                 }));
 
             return Ok(pictureDto);

@@ -1,16 +1,18 @@
+import { BannerStructureService } from 'src/app/_services/banner-structure.service';
 import { User } from 'src/app/_model/user.interface';
 import { AuthService } from 'src/app/_services/auth.service';
 import { ContactService } from 'src/app/_services/Contact.service';
 import { Contact } from './../../_model/Contact.interface';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { defaultPaginationResult, PaginationResult } from 'src/app/_model/paginationResult.interface';
 import { defaultQueryObject, QueryObject } from 'src/app/_model/queryObject.interface';
 import { Subscription } from 'rxjs';
 import { ProgressSpinnerService } from 'src/app/_services/progress-spinner.service';
 import { PageEvent } from '@angular/material/paginator';
-import { Sort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 import { switchMap } from 'rxjs/operators';
+import { defaultBannerStructure } from 'src/app/_model/Constants';
 
 @Component({
   selector: 'app-contact-list',
@@ -35,13 +37,16 @@ export class ContactListComponent implements OnInit {
 
     displayedColumns: string[] = [this.SortByContactName, this.SortByPhone, this.SortByBirthDate, 
                                   this.SortByContactType, this.ColumnButton];
-    dataSource = new MatTableDataSource(this.paginationResult.items);  
+    dataSource: MatTableDataSource<Contact>;  
     user : User;
+
+    @ViewChild(MatSort) sort: MatSort;
 
     constructor(private contactService : ContactService, 
       public progressSpinnerService : ProgressSpinnerService,
-      private authService : AuthService) { }
-
+      private authService : AuthService,
+      private bannerStructureService: BannerStructureService) { }
+  
     ngOnDestroy(): void {
       if (!!this.subscriptionToGetPaginatedContacts) 
         this.subscriptionToGetPaginatedContacts.unsubscribe();
@@ -57,21 +62,36 @@ export class ContactListComponent implements OnInit {
           }
         ); 
         
-      this.authService.user
-        .pipe(switchMap(u => {
-          this.user = u;
-          return this.contactService.getPaginatedContacts(this.queryObject)
-        })) 
-        .subscribe(
-          res => this.paginationResult = res
-        );  
+      this.subscriptionToGetPaginatedContacts 
+        = this.authService.user
+          .pipe(switchMap(u => {
+            console.log("llego");
+            this.user = u;
+            return this.contactService.getPaginatedContacts(this.queryObject)
+          })) 
+          .subscribe(          
+            res => {
+              this.paginationResult = res;  
+              this.updateDataSource();        
+            }
+          );  
+
+      this.bannerStructureService.updateBanner({
+          ...defaultBannerStructure
+      });   
     } 
 
-    onPageChanged($event: PageEvent){    
-      console.log($event);
+    onPageChanged($event: PageEvent){   
       this.queryObject.page = $event.pageIndex;
       this.queryObject.pageSize = $event.pageSize;
       this.loadPaginatedContacts();
+    }
+
+    updateDataSource(){  
+      console.log("updateDataSource");
+      console.log(this.paginationResult.items);  
+      this.dataSource = new MatTableDataSource(this.paginationResult.items);
+      this.dataSource.sort = this.sort; 
     }
 
     loadPaginatedContacts(){
@@ -79,8 +99,11 @@ export class ContactListComponent implements OnInit {
       this.subscriptionToGetPaginatedContacts 
         = this.contactService.getPaginatedContacts(this.queryObject)
           .subscribe(
-            res => this.paginationResult = res
-          );
+            res => {
+              console.log("loadPaginatedContacts");
+              this.paginationResult = res;
+              this.updateDataSource();
+            });
     }
 
     onSortChange($event : Sort){

@@ -1,58 +1,56 @@
-<div class="example-container mat-elevation-z8">
-  <div class="example-loading-shade"
-       *ngIf="isLoadingOrUploading">
-    <mat-spinner 
-       [value] = "(progressSpinnerService.uploadProgress | async)"></mat-spinner>      
-  </div>
 
-  <div class="example-table-container">  
-        <table mat-table [dataSource]="dataSource" matSort class="example-table"
-               (matSortChange)="onSortChange($event)">
-          <!-- Position Column -->
-          <ng-container [matColumnDef]= "SortByContactName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Contact Name </th>
-            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-          </ng-container>
-        
-          <!-- Name Column -->
-          <ng-container [matColumnDef]="SortByContactType">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Contact Type </th>
-            <td mat-cell *matCellDef="let element"> {{element.contactType.name}} </td>
-          </ng-container>
-        
-          <!-- Weight Column -->
-          <ng-container [matColumnDef]="SortByPhone">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
-            <td mat-cell *matCellDef="let element"> {{element.phone}} </td>
-          </ng-container>
-        
-          <!-- Symbol Column -->
-          <ng-container [matColumnDef]="SortByBirthDate">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Birth Date </th>
-            <td mat-cell *matCellDef="let element"> {{element.birthDate}} </td>
-          </ng-container>
-        
-          <!-- Symbol Column -->
-          <ng-container matColumnDef="ColumnButton">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let element"> 
-              <button mat-raised-button *ngIf="element.createdByUser.id == user.id" color="warn" 
-                focusable="false"  (click) = "deleteContact(element.id)">
-                 Delete
-              </button> 
-            </td>
-          </ng-container>
-        
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-  </div>
 
-  <mat-paginator style="margin: auto;"
-      [length] = "paginationResult.totalItems"
-      [pageSize] = "paginationResult.pageSize"
-      [pageSizeOptions] = "[5, 10, 15, 20]"
-      [pageIndex] = "paginationResult.page"
-      (page) = "onPageChanged($event)"
-    ></mat-paginator>
-</div>
+    <div class="example-container mat-elevation-z8">
+      <div class="example-loading-shade"
+           *ngIf="isLoadingOrUploading">
+        <mat-spinner 
+           [value] = "(progressSpinnerService.uploadProgress | async)"></mat-spinner>      
+      </div>
+    
+      <div class="example-table-container">  
+            <table mat-table [dataSource]="dataSource" matSort class="example-table"
+                   (matSortChange)="onSortChange($event)">
+             
+              <ng-container [matColumnDef]= "SortByContactName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Contact Name </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+              </ng-container>        
+            
+              <ng-container [matColumnDef]="SortByContactType">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Contact Type </th>
+                <td mat-cell *matCellDef="let element"> {{element.contactType.name}} </td>
+              </ng-container>
+                      
+              <ng-container [matColumnDef]="SortByPhone">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
+                <td mat-cell *matCellDef="let element"> {{element.phone}} </td>
+              </ng-container>        
+             
+              <ng-container [matColumnDef]="SortByBirthDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Birth Date </th>
+                <td mat-cell *matCellDef="let element"> {{element.birthDate | date:'full'}} </td>
+              </ng-container>
+                     
+              <ng-container [matColumnDef]="ColumnButton">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element"> 
+                  <button mat-raised-button *ngIf="element?.createdByUser?.id == user?.id" color="warn" 
+                    focusable="false"  (click) = "deleteContact(element.id)">
+                     Delete
+                  </button> 
+                </td>
+              </ng-container>
+            
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+      </div>
+    
+      <mat-paginator style="margin: auto;"
+          [length] = "paginationResult.totalItems"
+          [pageSize] = "paginationResult.pageSize"
+          [pageSizeOptions] = "[5, 10, 15, 20]"
+          [pageIndex] = "paginationResult.page"
+          (page) = "onPageChanged($event)"
+        ></mat-paginator>
+    </div>

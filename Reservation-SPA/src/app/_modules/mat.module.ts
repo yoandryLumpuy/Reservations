@@ -15,8 +15,10 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatSelectModule } from "@angular/material/select";
 import {  MatDatepickerModule } from "@angular/material/datepicker";
-import { MatList, MatListModule } from "@angular/material/list";
+import { MatListModule } from "@angular/material/list";
 import { MatSortModule } from "@angular/material/sort";
+import { LayoutModule } from "@angular/cdk/layout";
+import { MatNativeDateModule } from '@angular/material/core';
 
 @NgModule({
   exports:[
@@ -37,7 +39,9 @@ import { MatSortModule } from "@angular/material/sort";
     MatSelectModule,
     MatDatepickerModule,
     MatListModule,
-    MatSortModule
+    MatSortModule,
+    LayoutModule,
+    MatNativeDateModule
   ]
 })
 export class MatModule { }

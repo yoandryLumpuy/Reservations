@@ -44,9 +44,9 @@ namespace Reservation_API
             services.AddControllers();
             services.AddDbContext<ReservationDbContext>(dbContextOptionsBuilder =>
             {
-                dbContextOptionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-                    // .ReplaceService<IQueryTranslationPostprocessorFactory, SqlServer2008QueryTranslationPostprocessorFactory>();
-            });
+                dbContextOptionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+                    .ReplaceService<IQueryTranslationPostprocessorFactory, SqlServer2008QueryTranslationPostprocessorFactory>();
+            }, ServiceLifetime.Transient);
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRepository, Repository>();

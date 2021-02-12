@@ -1,3 +1,4 @@
+import { BannerComponent } from './_components/banner/banner.component';
 import { ContactListComponent } from './_components/contact-list/contact-list.component';
 import { ReservationListComponent } from './_components/reservation-list/reservation-list.component';
 import { ToolbarComponent } from './_components/Toolbar/Toolbar.component';
@@ -13,7 +14,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { AppComponent } from './app.component';
 import { NavBarComponent } from './_components/navBar/navBar.component';
-import { FlexLayoutModule } from "@angular/flex-layout";
 import { UserWithRolesDirective } from './_directives/userWithRoles.directive';
 import { appRoutingModule } from './app-routing.module';
 import { AuthInterceptorService } from './_services/authInterceptor.service';
@@ -26,7 +26,6 @@ import { EditReservationComponent } from './_components/edit-reservation/edit-re
 import { EditContactComponent } from './_components/edit-contact/edit-contact.component';
 import { LoginComponent } from './_components/login/login.component';
 import { ReservationListItemComponent } from './_components/reservation-list-item/reservation-list-item.component';
-import { TableComponent } from './table/table.component';
 
 @NgModule({
   declarations: [					
@@ -43,7 +42,7 @@ import { TableComponent } from './table/table.component';
       LoginComponent,
       ReservationListItemComponent,
       ContactListComponent,
-      TableComponent
+      BannerComponent
    ],
   imports: [
     BrowserModule, 
@@ -53,8 +52,7 @@ import { TableComponent } from './table/table.component';
     BrowserAnimationsModule,
     appRoutingModule,
     MatModule, 
-    ReactiveFormsModule,
-    FlexLayoutModule
+    ReactiveFormsModule
   ],
   providers: [
     {provide: ErrorHandler, useClass: MyErrorHandler},

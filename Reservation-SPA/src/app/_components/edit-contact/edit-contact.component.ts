@@ -1,3 +1,4 @@
+import { BannerStructureService } from 'src/app/_services/banner-structure.service';
 import { User } from './../../_model/user.interface';
 import { AuthService } from './../../_services/auth.service';
 import { Contact } from './../../_model/Contact.interface';
@@ -5,7 +6,7 @@ import { catchError, switchMap } from 'rxjs/operators';
 import { ContactType } from './../../_model/ContactType.interface';
 import { ContactService } from './../../_services/Contact.service';
 import { Observable, of, Subscription } from 'rxjs';
-import { PhonePattern } from './../../_model/Constants';
+import { defaultBannerStructure, PhonePattern, PhonePlaceHolder } from './../../_model/Constants';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { AlertService } from 'src/app/_services/alert.service';
@@ -22,6 +23,7 @@ export class EditContactComponent implements OnInit, OnDestroy {
   contactTypes: ContactType[] = [];
   subscriptionLoadData : Subscription; 
   subscriptionFillForm : Subscription;
+  phonePlaceHolder = PhonePlaceHolder;
 
   model: ContactForModifications;
   isEditing = false; 
@@ -40,7 +42,8 @@ export class EditContactComponent implements OnInit, OnDestroy {
   constructor(private contactService : ContactService, 
     private alertService : AlertService,
     private router : Router, private  route : ActivatedRoute,
-    private authService : AuthService) {         
+    private authService : AuthService,
+    private bannerStructureService: BannerStructureService) {         
   } 
 
   get contactName(){
@@ -90,11 +93,11 @@ export class EditContactComponent implements OnInit, OnDestroy {
     this.subscriptionFillForm  = this.route.paramMap.pipe(
       switchMap(res =>
         {
-           this.isEditing = res.get('id') != null;            
+           this.isEditing = res.get('id') != null;    
            if (this.isEditing) 
             this.contactId = res.get('id'); 
            else {
-            this.contactName.setAsyncValidators(this.contactAlreadyExist);    
+            this.contactName.setAsyncValidators(this.contactAlreadyExist.bind(this));    
             this.contactName.updateValueAndValidity();
            }          
 
@@ -103,16 +106,24 @@ export class EditContactComponent implements OnInit, OnDestroy {
       )
       .subscribe(contact => this.fillContactData(contact),
       (error) => {});
+
+      this.bannerStructureService.updateBanner({
+        ...defaultBannerStructure
+      }); 
   }
 
   fillContactData(c : Contact){ 
-    //set values in the form
+    var values = this.form.value;
+    //set values in the form    
     this.form.setValue({
+      ...values,
       contactName: c.name,    
       contactTypeId: c.contactType.id,
       phone: c.phone,
       birthDate: c.birthDate
-    })
+    });
+    if (this.isEditing) this.contactName.disable()
+    else this.contactName.enable();
   }
 
   includeContactTypeToSourceLists(c : Contact){ 
@@ -133,8 +144,8 @@ export class EditContactComponent implements OnInit, OnDestroy {
   }
 
   contactAlreadyExist(control: AbstractControl): 
-              Promise<ValidationErrors | null> | Observable<ValidationErrors | null>{    
-    return this.contactService.getContactByName(control.value)
+              Promise<ValidationErrors | null> | Observable<ValidationErrors | null>{  
+        return this.contactService.getContactByName(control.value)
            .pipe(switchMap(c => { 
               this.includeContactTypeToSourceLists(c);             
               return of({contactAlreadyExist: true});

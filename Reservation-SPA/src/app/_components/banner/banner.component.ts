@@ -1,34 +1,31 @@
-import { AuthService } from 'src/app/_services/auth.service';
-import { Component, OnInit } from '@angular/core';
+import { EditReservationComponent } from './../edit-reservation/edit-reservation.component';
+import { BreakpointObserverService } from './../../_services/breakpoint-observer.service';
 import { Subscription } from 'rxjs';
-import { BannerStructure } from 'src/app/_model/Constants';
 import { BannerStructureService } from 'src/app/_services/banner-structure.service';
-import { BreakpointObserverService } from 'src/app/_services/breakpoint-observer.service';
-import { EditReservationComponent } from '../edit-reservation/edit-reservation.component';
-import { AlertService } from 'src/app/_services/alert.service';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { BannerStructure } from 'src/app/_model/Constants';
+import { ReservationListComponent } from '../reservation-list/reservation-list.component';
 
 @Component({
-  selector: 'app-Toolbar',
-  templateUrl: './Toolbar.component.html',
-  styleUrls: ['./Toolbar.component.css']
+  selector: 'app-banner',
+  templateUrl: './banner.component.html',
+  styleUrls: ['./banner.component.css']
 })
-export class ToolbarComponent implements OnInit {
+export class BannerComponent implements OnInit, OnDestroy {
   subscription : Subscription;
   subscriptionToBreakpointObserver : Subscription;
   structure : BannerStructure;
   inSmallScreen: boolean;
 
   constructor(public bannerStructureService: BannerStructureService,
-    public breakpointObserverService: BreakpointObserverService,
-    public authService: AuthService,
-    private alertService: AlertService) { }
+    public breakpointObserverService: BreakpointObserverService) { }
 
   get instanceOfEditReservation(){
     return this.structure?.emittedBy instanceof EditReservationComponent;
   }
 
   get instanceOfReservationList(){
-    return this.structure?.emittedBy instanceof EditReservationComponent;
+    return this.structure?.emittedBy instanceof ReservationListComponent;
   }
   
   ngOnDestroy(): void {
@@ -46,9 +43,4 @@ export class ToolbarComponent implements OnInit {
         this.inSmallScreen = res;
       });
   }  
-
-  logout(){
-    this.authService.logout();
-    this.alertService.success("successful loggout!");    
-  }
 }

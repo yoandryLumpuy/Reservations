@@ -1,3 +1,4 @@
+import { ContactListComponent } from './_components/contact-list/contact-list.component';
 import { CanEditReservationGuard } from './_guards/can-edit-reservation.service';
 import { ReservationListComponent } from './_components/reservation-list/reservation-list.component';
 import { AuthGuardService } from './_guards/authGuard.service';
@@ -9,7 +10,7 @@ import { EditContactComponent } from './_components/edit-contact/edit-contact.co
 import { CanEditContactGuard } from './_guards/can-edit-contact.service';
 
 const routes: Routes = [
-  {path: '', component: LoginComponent}, 
+  {path: '', component: ReservationListComponent}, 
   {
     path: '',
     runGuardsAndResolvers: 'always',

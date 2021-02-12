@@ -115,10 +115,10 @@ namespace Reservation_API.Persistence
             return await PaginationResult<Reservation>.CreateAsync(query, queryObject.Page, queryObject.PageSize);
         }
 
-        public async Task<bool> YouLikeReservationAsync(int userId, int reservationId)
+        public bool YouLikeReservationAsync(int userId, int reservationId)
         {            
-            return await _reservationDbContext.UserLikesReservations.AnyAsync(userLikes =>
-                            userLikes.UserId == userId && userLikes.ReservationId == reservationId);
+            return _reservationDbContext.UserLikesReservations.Any(userLikes =>
+                        userLikes.UserId == userId && userLikes.ReservationId == reservationId);
         }
 
         public async Task<Reservation> ModifyFavoritesAsync(int userId, int reservationId)

@@ -14,7 +14,7 @@ namespace Reservation_API.Persistence
         Task<Reservation> GetReservationAsync(int id);
         Task<PaginationResult<Reservation>> GetReservationsAsync(QueryObject queryObject);
         Task<Reservation> CreateOrUpdateReservationAsync(int invokingUserId, ReservationForModificationsDto reservationForModificationsDto);
-        Task<bool> YouLikeReservationAsync(int userId, int reservationId);
+        bool YouLikeReservationAsync(int userId, int reservationId);
         Task<Reservation> ModifyFavoritesAsync(int userId, int reservationId);
 
 

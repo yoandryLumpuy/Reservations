@@ -53,7 +53,7 @@ export class ContactService {
       return this.http.get<Contact>(`${environment.baseUrl}contacts/byname/${contactName}`);
     }
 
-    getPaginatedContacts(queryObject: QueryObject) : Observable<PaginationResult<Contact>>{              
+    getPaginatedContacts(queryObject: QueryObject) : Observable<PaginationResult<Contact>>{           
       return this.http.get<PaginationResult<Contact>>(environment.baseUrl + "contacts?"+ this.queryObjectToString(queryObject), 
                   {reportProgress: true});
     }

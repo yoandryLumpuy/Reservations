@@ -1,3 +1,5 @@
+import { defaultBannerStructure, PhonePlaceHolder } from './../../_model/Constants';
+import { BreakpointObserverService } from './../../_services/breakpoint-observer.service';
 import { Reservation } from './../../_model/reservation.interface';
 import { User } from './../../_model/user.interface';
 import { Contact } from './../../_model/Contact.interface';
@@ -7,12 +9,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Subscription } from 'rxjs';
-import { switchMap} from 'rxjs/operators';
+import { map, switchMap} from 'rxjs/operators';
 import { PhonePattern } from 'src/app/_model/Constants';
 import { ContactType } from 'src/app/_model/ContactType.interface';
 import { ReservationForModifications } from 'src/app/_model/ReservationForModifications.interface';
 import { AlertService } from 'src/app/_services/alert.service';
 import { ContactService } from 'src/app/_services/Contact.service';
+import { BannerStructureService } from 'src/app/_services/banner-structure.service';
 
 @Component({
   selector: 'app-edit-reservation',
@@ -25,10 +28,13 @@ export class EditReservationComponent implements OnInit {
   subscriptionLoadData : Subscription;   
   subscriptionFillForm : Subscription;
 
+  phonePlaceHolder = PhonePlaceHolder;
+
   model: ReservationForModifications;
   isEditingReservation = false; 
   reservationId: any;
-  disableContactEdition = false; 
+  showContactList = false;
+  inSmallScreen = false;
 
   form = new FormGroup({
     contactName: new FormControl('', Validators.required),    
@@ -37,10 +43,14 @@ export class EditReservationComponent implements OnInit {
     birthDate: new FormControl('', Validators.required)
   });
 
+  
   constructor(private contactService : ContactService, 
     private reservationService : ReservationService, private alertService : AlertService,
+    private bannerStructureService : BannerStructureService,
+    private breakpointObserverService : BreakpointObserverService,
     private authService : AuthService,
-    private router : Router, private  route : ActivatedRoute) {         
+    private router : Router, private  route : ActivatedRoute) {  
+             
   } 
 
   get contactName(){
@@ -67,6 +77,7 @@ export class EditReservationComponent implements OnInit {
   ngOnInit() { 
     this.loadData();
     this.fillForm();
+    this.updateBanner();
   }
 
   loadData(){
@@ -86,22 +97,26 @@ export class EditReservationComponent implements OnInit {
             this.router.navigate(['']);
         }
     });
+
+    this.breakpointObserverService.inSmallScreen.subscribe(res =>
+      this.inSmallScreen = res);
   }
 
   fillForm(){
+    var inSmallScreen = false;
     if (this.subscriptionFillForm) this.subscriptionFillForm.unsubscribe();
-    this.subscriptionFillForm  = this.route.paramMap.pipe(
-      switchMap(res =>
-        {
-           this.isEditingReservation = res.get('id') != null;            
-           if (this.isEditingReservation) this.reservationId = res.get('id');  
-           return this.reservationService.getReservation(parseInt(this.reservationId));        
-        })
-      )
-      .subscribe(reservation => {
-        if (this.isEditingReservation) this.fillReservationData(reservation);        
-      },
-      (error) => {}); 
+    this.subscriptionFillForm =
+        this.route.paramMap.pipe(
+          switchMap(res =>
+          {
+            this.isEditingReservation = res.get('id') != null;            
+            if (this.isEditingReservation) this.reservationId = res.get('id');              
+            return this.reservationService.getReservation(parseInt(this.reservationId));        
+          }))      
+        .subscribe(reservation => {
+          if (this.isEditingReservation) this.fillReservationData(reservation);        
+        },
+        (error) => {}); 
   }
 
   fillContactData(c : Contact){ 
@@ -114,6 +129,17 @@ export class EditReservationComponent implements OnInit {
       phone: c.phone,
       birthDate: c.birthDate
     })
+  }
+
+  updateBanner(){
+    this.bannerStructureService.updateBanner({
+      ...defaultBannerStructure,
+      leftText: (this.isEditingReservation ? 'Update ' : 'Create ') + 'Reservation',
+      middleText : 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.' 
+           + 'Nemo odio cum voluptatibus sapiente deleniti magni, officia et ab minus blanditiis.',
+      navigationButtonText: 'Reservation List',
+      emittedBy: this
+    });
   }
 
   fillReservationData(r : Reservation){ 
@@ -155,10 +181,23 @@ export class EditReservationComponent implements OnInit {
       .subscribe(c =>{  
         this.includeContactToSourceLists(c);            
         this.fillContactData(c);
-        this.disableContactEdition = user.id !== c.createdByUser.id         
+        this.updateContactEdition(user.id !== c.createdByUser.id);         
       },
       (error) => {});
   }
+
+  updateContactEdition(disable : boolean){
+    if (disable){
+      this.contactTypeId.disable();
+      this.phone.disable();
+      this.birthDate.disable();
+    }
+    else{
+      this.contactTypeId.enable();
+      this.phone.enable();
+      this.birthDate.enable();
+    }
+  };
 
   onSubmit(){
     this.model = {...this.form.value};
@@ -166,5 +205,9 @@ export class EditReservationComponent implements OnInit {
       .subscribe(res => {
           this.alertService.success(`Contact successfully ${this.isEditingReservation ? 'updated' : 'created'}`);
       });
+  }
+
+  toggleContactList(){
+    this.showContactList = !this.showContactList;
   }
 }

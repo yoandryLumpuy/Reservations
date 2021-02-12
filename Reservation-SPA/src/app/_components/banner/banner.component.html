@@ -1,0 +1,26 @@
+<mat-grid-list [cols]="inSmallScreen ? '1' : '6'" 
+      *ngIf="structure.leftText != '' || 
+             structure.middleText != '' || 
+             structure.navigationButtonText != ''">
+  
+  <ng-template *ngIf="!inSmallScreen">
+    <mat-grid-tile [colspan] = "1" [rowspan] = "1"></mat-grid-tile> 
+  </ng-template>           
+  
+  <mat-grid-tile [colspan] = "1" [rowspan] = "1">
+     <h1>{{structure.leftText}}</h1> 
+  </mat-grid-tile>
+
+  <mat-grid-tile *ngIf="!(instanceOfReservationList && inSmallScreen)" 
+    [colspan] = "inSmallScreen ? 1 : 2" [rowspan] = "1">
+      <p>{{structure.middleText}}</p>
+  </mat-grid-tile>
+
+  <mat-grid-tile *ngIf="!inSmallScreen" [colspan] = "1" [rowspan] = "1">    
+    <button mat-stroked-button>{{structure.navigationButtonText}}</button>
+  </mat-grid-tile> 
+  
+  <ng-template *ngIf="!inSmallScreen">
+    <mat-grid-tile [colspan] = "1" [rowspan] = "1"></mat-grid-tile> 
+  </ng-template>  
+</mat-grid-list>

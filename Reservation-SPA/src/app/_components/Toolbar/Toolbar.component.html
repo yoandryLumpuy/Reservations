@@ -1,23 +1,33 @@
+<mat-grid-list cols="2" rowHeight="100px">
+  <mat-toolbar color="primary" style="min-height: 100px;">  
+    <mat-toolbar-row>   
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+            <h1><strong>ISU</strong>Corp</h1>
+        </mat-grid-tile>    
 
-  <mat-toolbar color="primary">
-    <mat-toolbar-row class = "back-image" style="height: 150px;">        
-      <h6><strong>Lorem ipsum </strong>Lorem </h6>
-      <div>
-        <h1>Lorem ipsum ?</h1>
-        <h1>Lorem, laboriosam.</h1>
-      </div>
-    </mat-toolbar-row>
-    <!-- <mat-toolbar-row>
-      <span>Second Line</span>
-      <span class="example-spacer"></span>
-      <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
-        <mat-icon>favorite</mat-icon>
-      </button>
-      <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
-        <mat-icon>share</mat-icon>
-      </button>
-    </mat-toolbar-row> -->
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+            <button *ngIf="inSmallScreen" mat-button>
+              <mat-icon *ngIf="instanceOfReservationList" matPrefix>arrow_left</mat-icon>            
+              {{structure.navigationButtonText}}
+              <mat-icon *ngIf="instanceOfEditReservation" matSuffix>arrow_right</mat-icon>
+            </button>
+
+            <span class="example-spacer"></span>
+
+            <button mat-icon-button [matMenuTriggerFor] = "menu" *ngIf="!!(authService.user | async)">
+              <mat-icon>more_vert</mat-icon>
+            </button> 
+        </mat-grid-tile>
+    </mat-toolbar-row> 
   </mat-toolbar>
+</mat-grid-list>
+
+<mat-menu #menu="matMenu">          
+  <button mat-menu-item (click) = "logout()">
+    <mat-icon >logout</mat-icon>
+    <span>Logout</span>
+  </button>
+</mat-menu> 
 
 
 
