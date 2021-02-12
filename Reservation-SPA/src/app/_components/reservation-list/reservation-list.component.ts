@@ -1,3 +1,4 @@
+import { AuthService } from 'src/app/_services/auth.service';
 import { ReservationService } from 'src/app/_services/Reservation.service';
 import { BreakpointObserverService } from 'src/app/_services/breakpoint-observer.service';
 import { BannerStructureService } from 'src/app/_services/banner-structure.service';
@@ -34,7 +35,8 @@ export class ReservationListComponent implements OnInit {
   constructor(public progressSpinnerService : ProgressSpinnerService,
     private bannerStructureService: BannerStructureService,
     private breakpointObserverService: BreakpointObserverService,
-    private reservationService: ReservationService) { }
+    private reservationService: ReservationService,
+    private auth : AuthService) { }
 
   ngOnDestroy(): void {
     if (this.subscriptionToProgressSpinner) this.subscriptionToProgressSpinner.unsubscribe();
@@ -62,11 +64,10 @@ export class ReservationListComponent implements OnInit {
                       + 'Rem similique doloribus sunt earum commodi ad exercitationem error illum sed nam.',
         navigationButtonText: 'Reservation List',
         emittedBy: this
-      }); 
+      });   
       
     this.reservationService.getReservations(defaultQueryObject).subscribe(      
-      res => {
-        console.log(res);
+      res => {        
         this.paginationResult = res;
       }
     ); 

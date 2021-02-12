@@ -2,7 +2,7 @@ import { EditReservationComponent } from './_components/edit-reservation/edit-re
 import { BannerStructureService } from 'src/app/_services/banner-structure.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from './_services/auth.service';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Inject, inject, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { defaultBannerStructure } from './_model/Constants';
@@ -13,10 +13,10 @@ import { defaultBannerStructure } from './_model/Constants';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit{
-  constructor(private authService : AuthService, private bannerStructureService: BannerStructureService){}   
+  constructor(@Inject(AuthService) private authService : AuthService, private bannerStructureService: BannerStructureService){}   
 
   ngOnInit(): void {  
-    this.authService.autologin();          
+    this.authService.autologin();
 
     this.bannerStructureService.updateBanner({
       ...defaultBannerStructure,

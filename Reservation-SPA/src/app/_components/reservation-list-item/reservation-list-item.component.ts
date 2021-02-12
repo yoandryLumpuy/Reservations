@@ -18,8 +18,10 @@ export class ReservationListItemComponent implements OnInit, OnDestroy {
     private authService: AuthService) { }
 
   ngOnInit() {
-     this.authService.user.subscribe(user =>
-      this.userId = !!user ? user.id : 0);
+    console.log(this.authService);
+    this.authService.user.subscribe(u =>{
+      this.userId = !!u ? u.id : 0;
+     });
   }
 
   ngOnDestroy(): void {

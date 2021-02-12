@@ -19,7 +19,7 @@ import { defaultBannerStructure } from 'src/app/_model/Constants';
   templateUrl: './contact-list.component.html',
   styleUrls: ['./contact-list.component.css']
 })
-export class ContactListComponent implements OnInit {
+export class ContactListComponent implements OnInit, AfterViewInit {
     SortByContactName : string = 'ContactName';
     SortByPhone : string = 'Phone';
     SortByBirthDate : string = 'BirthDate';
@@ -37,7 +37,7 @@ export class ContactListComponent implements OnInit {
 
     displayedColumns: string[] = [this.SortByContactName, this.SortByPhone, this.SortByBirthDate, 
                                   this.SortByContactType, this.ColumnButton];
-    dataSource: MatTableDataSource<Contact>;  
+    dataSource = new MatTableDataSource(this.paginationResult.items);  
     user : User;
 
     @ViewChild(MatSort) sort: MatSort;
@@ -46,6 +46,10 @@ export class ContactListComponent implements OnInit {
       public progressSpinnerService : ProgressSpinnerService,
       private authService : AuthService,
       private bannerStructureService: BannerStructureService) { }
+
+    ngAfterViewInit(): void {
+      this.dataSource.sort = this.sort;
+    }
   
     ngOnDestroy(): void {
       if (!!this.subscriptionToGetPaginatedContacts) 
@@ -61,20 +65,8 @@ export class ContactListComponent implements OnInit {
             this.isLoadingOrUploading = !!res && res < 100;
           }
         ); 
-        
-      this.subscriptionToGetPaginatedContacts 
-        = this.authService.user
-          .pipe(switchMap(u => {
-            console.log("llego");
-            this.user = u;
-            return this.contactService.getPaginatedContacts(this.queryObject)
-          })) 
-          .subscribe(          
-            res => {
-              this.paginationResult = res;  
-              this.updateDataSource();        
-            }
-          );  
+
+      this.loadPaginatedContacts();  
 
       this.bannerStructureService.updateBanner({
           ...defaultBannerStructure
@@ -87,23 +79,27 @@ export class ContactListComponent implements OnInit {
       this.loadPaginatedContacts();
     }
 
-    updateDataSource(){  
-      console.log("updateDataSource");
-      console.log(this.paginationResult.items);  
+    updateDataSource(){ 
       this.dataSource = new MatTableDataSource(this.paginationResult.items);
-      this.dataSource.sort = this.sort; 
+      this.dataSource.sort = this.sort;       
     }
 
-    loadPaginatedContacts(){
-      if (this.subscriptionToGetPaginatedContacts) this.subscriptionToGetPaginatedContacts.unsubscribe();
+    loadPaginatedContacts(){      
+      if (this.subscriptionToGetPaginatedContacts) 
+        this.subscriptionToGetPaginatedContacts.unsubscribe();
+
       this.subscriptionToGetPaginatedContacts 
-        = this.contactService.getPaginatedContacts(this.queryObject)
+        = this.authService.user
+          .pipe(switchMap(u => {
+            this.user = u;
+            return this.contactService.getPaginatedContacts(this.queryObject)
+          })) 
           .subscribe(
-            res => {
-              console.log("loadPaginatedContacts");
+            res =>{
               this.paginationResult = res;
               this.updateDataSource();
-            });
+            } 
+          );
     }
 
     onSortChange($event : Sort){

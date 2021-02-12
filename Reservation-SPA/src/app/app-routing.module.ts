@@ -20,7 +20,8 @@ const routes: Routes = [
       {path: 'reservations/new', component: EditReservationComponent},
       {path: 'reservations/:id/edit', component: EditReservationComponent, canActivate: [CanEditReservationGuard]},
       {path: 'contacts/new', component: EditContactComponent},      
-      {path: 'contacts/:id/edit', component: EditContactComponent, canActivate: [CanEditContactGuard]}
+      {path: 'contacts/:id/edit', component: EditContactComponent, canActivate: [CanEditContactGuard]},
+      {path: 'contacts', component: ContactListComponent},
     ]
   },  
   {path: '**', redirectTo: '', pathMatch: 'full'}       

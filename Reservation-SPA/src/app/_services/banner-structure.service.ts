@@ -7,7 +7,7 @@ import { BannerStructure, defaultBannerStructure } from '../_model/Constants';
   providedIn: 'root'
 })
 export class BannerStructureService {    
-  observer : BehaviorSubject<BannerStructure> = new BehaviorSubject<BannerStructure>(defaultBannerStructure);
+  public observer : BehaviorSubject<BannerStructure> = new BehaviorSubject<BannerStructure>(defaultBannerStructure);
 
   constructor() { }
 

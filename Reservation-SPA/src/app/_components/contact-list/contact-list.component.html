@@ -1,5 +1,3 @@
-
-
     <div class="example-container mat-elevation-z8">
       <div class="example-loading-shade"
            *ngIf="isLoadingOrUploading">
@@ -34,7 +32,7 @@
               <ng-container [matColumnDef]="ColumnButton">
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let element"> 
-                  <button mat-raised-button *ngIf="element?.createdByUser?.id == user?.id" color="warn" 
+                  <button mat-raised-button *ngIf="element.createdByUser.id == user.id" color="warn" 
                     focusable="false"  (click) = "deleteContact(element.id)">
                      Delete
                   </button> 

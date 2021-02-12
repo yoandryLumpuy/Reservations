@@ -4,6 +4,6 @@
     </mat-list-item>
 </mat-list> -->
 
-<ng-template *ngFor="let reservation of paginationResult.items">
-    <app-reservation-list-item [reservation] = "reservation"></app-reservation-list-item>
+<ng-template *ngFor="let r of paginationResult.items">
+    <app-reservation-list-item [reservation] = "r"></app-reservation-list-item>
 </ng-template>

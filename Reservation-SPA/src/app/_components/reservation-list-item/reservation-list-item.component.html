@@ -1,9 +1,14 @@
-<mat-grid-list cols="7" rowHeight="20px">
+<p>works</p>
+<p>userId</p>
+<!-- <mat-grid-list cols="6" rowHeight="50px">
   <mat-grid-tile></mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="2"></mat-grid-tile>
+  <mat-grid-tile [colspan]="1" [rowspan]="1"></mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="1"><h3>{{reservation.contact.name}}</h3></mat-grid-tile>  
+  <mat-grid-tile [colspan]="1" [rowspan]="1">
+    <h3>{{reservation.contact.name}}</h3>
+    <small>{{reservation.createdDateTime | date:'full'}}</small>    
+  </mat-grid-tile>
 
   <mat-grid-tile [colspan]="1" [rowspan]="1">      
       <div>
@@ -15,20 +20,18 @@
       </div>      
   </mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="2">
+  <mat-grid-tile [colspan]="1" [rowspan]="1">
       <div>
         <mat-icon [ngStyle] = "{color: reservation.youLikeIt ? 'red' : 'grey'}"
           (click) = modifyFavorite()>favorite_border</mat-icon>
       </div>
   </mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="2">
+  <mat-grid-tile [colspan]="1" [rowspan]="1">
     <button mat-raised-button *ngIf="userId == reservation.createdByUser.id"
       color="warn">Edit
     </button>
   </mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="2"></mat-grid-tile>
-
-  <mat-grid-tile [colspan]="1" [rowspan]="1"><small>{{reservation.createdDateTime | date:'full'}}</small></mat-grid-tile>
-</mat-grid-list>
+  <mat-grid-tile [colspan]="1" [rowspan]="1"></mat-grid-tile>  
+</mat-grid-list> -->

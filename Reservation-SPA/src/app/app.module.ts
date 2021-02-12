@@ -37,10 +37,10 @@ import { ReservationListItemComponent } from './_components/reservation-list-ite
       StringsLimitedPipe,
       ToolbarComponent,
       ReservationListComponent,
+      ReservationListItemComponent,
       EditReservationComponent,
       EditContactComponent,
-      LoginComponent,
-      ReservationListItemComponent,
+      LoginComponent,      
       ContactListComponent,
       BannerComponent
    ],
