@@ -13,5 +13,6 @@
         public const string SortByBirthDate = "BirthDate";
         public const string SortByContactType = "ContactType";
         public const string SortByCreatedDateTime = "CreatedDateTime";
+        public const string SortByRanking = "Ranking";
     }
 }

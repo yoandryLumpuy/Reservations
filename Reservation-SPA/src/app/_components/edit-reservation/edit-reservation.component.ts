@@ -5,17 +5,18 @@ import { User } from './../../_model/user.interface';
 import { Contact } from './../../_model/Contact.interface';
 import { AuthService } from './../../_services/auth.service';
 import { ReservationService } from './../../_services/Reservation.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, Subscription } from 'rxjs';
-import { map, switchMap} from 'rxjs/operators';
+import { forkJoin, Observable, Subscription, BehaviorSubject } from 'rxjs';
+import { map, startWith, switchMap} from 'rxjs/operators';
 import { PhonePattern } from 'src/app/_model/Constants';
 import { ContactType } from 'src/app/_model/ContactType.interface';
 import { ReservationForModifications } from 'src/app/_model/ReservationForModifications.interface';
 import { AlertService } from 'src/app/_services/alert.service';
 import { ContactService } from 'src/app/_services/Contact.service';
 import { BannerStructureService } from 'src/app/_services/banner-structure.service';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-edit-reservation',
@@ -35,6 +36,10 @@ export class EditReservationComponent implements OnInit {
   reservationId: any;
   showContactList = false;
   inSmallScreen = false;
+
+  filteredOptions = new BehaviorSubject<string[]>([]);
+
+  @ViewChild('EditContactButton') editContactButton: MatButton;  
 
   form = new FormGroup({
     contactName: new FormControl('', Validators.required),    
@@ -78,6 +83,31 @@ export class EditReservationComponent implements OnInit {
     this.loadData();
     this.fillForm();
     this.updateBanner();
+
+    this.contactName.valueChanges.subscribe(value =>{
+      startWith(''),
+      value = this.filter(value);
+      this.filteredOptions.next(value);
+
+      var user : User;
+      this.authService.user.pipe(
+        switchMap(u => {
+           user = u; 
+           return this.contactService.getContactByName(value);
+        }))
+        .subscribe(c =>{  
+          this.includeContactToSourceLists(c);            
+          this.fillContactData(c);
+          this.disableContactEdition(user.id !== c.createdByUser.id);         
+        },
+        (error) => {});
+    });
+  }
+
+  private filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+    return this.contacts.filter(option => option.name.toLowerCase().indexOf(filterValue) !== -1)
+           .map(c => c.name);
   }
 
   loadData(){
@@ -170,44 +200,37 @@ export class EditReservationComponent implements OnInit {
       this.contactTypes.push(c.contactType);
   }
 
-  onContactNameChange($event: any){
-    var user: User;
-    if (!!$event) 
-      this.authService.user.pipe(
-      switchMap(u => {
-         user = u; 
-         return this.contactService.getContactByName($event.target.value);
-      }))
-      .subscribe(c =>{  
-        this.includeContactToSourceLists(c);            
-        this.fillContactData(c);
-        this.updateContactEdition(user.id !== c.createdByUser.id);         
-      },
-      (error) => {});
-  }
-
-  updateContactEdition(disable : boolean){
+  disableContactEdition(disable : boolean){
     if (disable){
       this.contactTypeId.disable();
       this.phone.disable();
       this.birthDate.disable();
+      this.editContactButton.disabled = true;
     }
     else{
       this.contactTypeId.enable();
       this.phone.enable();
       this.birthDate.enable();
+      this.editContactButton.disabled = false;
     }
   };
 
   onSubmit(){
     this.model = {...this.form.value};
-    this.contactService.postContact(this.model)
+    this.reservationService.postReservation(this.model)
       .subscribe(res => {
-          this.alertService.success(`Contact successfully ${this.isEditingReservation ? 'updated' : 'created'}`);
+          this.alertService.success(`Reservation successfully ${this.isEditingReservation ? 'updated' : 'created'}`);
       });
   }
 
   toggleContactList(){
     this.showContactList = !this.showContactList;
+  }
+
+  editContact(name : string){
+    this.contactService.getContactByName(name)
+    .subscribe(c => {
+      this.router.navigate(['contacts', c.id, 'edit']);
+    });    
   }
 }

@@ -10,7 +10,7 @@ import { EditContactComponent } from './_components/edit-contact/edit-contact.co
 import { CanEditContactGuard } from './_guards/can-edit-contact.service';
 
 const routes: Routes = [
-  {path: '', component: ReservationListComponent}, 
+  {path: '', component: LoginComponent}, 
   {
     path: '',
     runGuardsAndResolvers: 'always',

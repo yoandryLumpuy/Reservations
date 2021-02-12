@@ -21,7 +21,7 @@ namespace Reservation_API.Persistence
 
         //working with Contacts
         Task<Contact> CreateOrUpdateContactByNameAsync(int invokingUserId, ContactForModificationsDto contactForModificationsDto);
-        Task<Contact> GetContactAsync(int id);
+        Task<Contact> GetContactAsync(int id, bool forElimination = false);
         Task<Contact> GetContactByNameAsync(string contactName);
         Task<PaginationResult<Contact>> GetContactsAsync(QueryObject queryObject);
         Task<List<Contact>> GetAllContactsAsync();

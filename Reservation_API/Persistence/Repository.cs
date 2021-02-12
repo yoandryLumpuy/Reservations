@@ -40,8 +40,12 @@ namespace Reservation_API.Persistence
                       .SingleOrDefaultAsync(res => res.Id == id);
         }
 
-        public async Task<Contact> GetContactAsync(int id)
-        {            
+        public async Task<Contact> GetContactAsync(int id, bool forElimination = false)
+        {   
+            if (forElimination)
+                return await _reservationDbContext.Contacts.EagerLoadRelatedObjectsForCascadeElimination()
+                        .SingleOrDefaultAsync(contact => contact.Id == id);
+
             return await _reservationDbContext.Contacts.EagerLoadRelatedObjects()
                     .SingleOrDefaultAsync(contact => contact.Id == id);
         }
@@ -102,14 +106,15 @@ namespace Reservation_API.Persistence
 
             var dictionary = new Dictionary<string, Expression<Func<Reservation, object>>>(){
                 [Constants.SortByCreatedDateTime] = reservation => reservation.CreatedDateTime,
-                [Constants.SortByContactName] = reservation => reservation.Contact.Name
+                [Constants.SortByContactName] = reservation => reservation.Contact.Name,
+                [Constants.SortByRanking] = reservation => reservation.UserLikesReservation.Count()
             };
 
             if (queryObject?.SortBy != null && dictionary.ContainsKey(queryObject.SortBy))
             {
                 query = queryObject.IsSortAscending                 
-                        ? query.OrderBy(res => dictionary[queryObject.SortBy]) 
-                        : query.OrderByDescending(res => dictionary[queryObject.SortBy]);            
+                        ? query.OrderBy(dictionary[queryObject.SortBy]) 
+                        : query.OrderByDescending(dictionary[queryObject.SortBy]);            
             }            
 
             return await PaginationResult<Reservation>.CreateAsync(query, queryObject.Page, queryObject.PageSize);
@@ -188,8 +193,14 @@ namespace Reservation_API.Persistence
 
         public async Task<bool> DeleteContactAsync(int contactId)
         {
-            var contact = await GetContactAsync(contactId);
-            if (contact != null) {
+            var contact = await GetContactAsync(contactId, forElimination: true);            
+            if (contact != null) {  
+                foreach(var r in contact.Reservations){
+                   var userLikes 
+                        = await _reservationDbContext.UserLikesReservations
+                           .Where(uLr => uLr.ReservationId == r.Id).ToListAsync(); 
+                   _reservationDbContext.UserLikesReservations.RemoveRange(userLikes);
+                }              
                 _reservationDbContext.Contacts.Remove(contact);
                 await _unitOfWork.CompleteAsync();
                 return true;

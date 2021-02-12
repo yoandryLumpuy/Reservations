@@ -1,37 +1,34 @@
-<p>works</p>
-<p>userId</p>
-<!-- <mat-grid-list cols="6" rowHeight="50px">
-  <mat-grid-tile></mat-grid-tile>
+<mat-grid-list [cols]="inSmallScreen ? '3' : '6'" rowHeight="100px" gutterSize="0"> 
 
-  <mat-grid-tile [colspan]="1" [rowspan]="1"></mat-grid-tile>
+  <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="1">
-    <h3>{{reservation.contact.name}}</h3>
-    <small>{{reservation.createdDateTime | date:'full'}}</small>    
+  <mat-grid-tile [colspan]="1" [rowspan]="1" [style.background]="'lightgray'">    
+    <div>
+      <h3 style="position: absolute; top: 30%; left: 10%; "><strong>{{reservation.contact.name}}</strong></h3>
+      <small style="position: absolute; top: 60%; left: 10%;">{{reservation.createdDateTime | date:'full'}}</small>
+    </div>        
   </mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="1">      
+  <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1" [style.background]="'lightgray'">      
       <div>
-        <mat-icon [ngStyle]="{color: reservation.ranking > 1 ? 'yellow' : 'grey'}">{{reservation.ranking ? 'star' : 'star_border'}}</mat-icon>
-        <mat-icon [ngStyle]="{color: reservation.ranking > 2 ? 'yellow' : 'grey'}">{{reservation.ranking ? 'star' : 'star_border'}}</mat-icon>
-        <mat-icon [ngStyle]="{color: reservation.ranking > 3 ? 'yellow' : 'grey'}">{{reservation.ranking ? 'star' : 'star_border'}}</mat-icon>
-        <mat-icon [ngStyle]="{color: reservation.ranking > 4 ? 'yellow' : 'grey'}">{{reservation.ranking ? 'star' : 'star_border'}}</mat-icon>
-        <mat-icon [ngStyle]="{color: reservation.ranking > 5 ? 'yellow' : 'grey'}">{{reservation.ranking ? 'star' : 'star_border'}}</mat-icon>
+        <mat-icon [ngStyle]="{color: reservation.ranking > 1 ? 'yellow' : 'grey'}">star</mat-icon>
+        <mat-icon [ngStyle]="{color: reservation.ranking > 2 ? 'yellow' : 'grey'}">star</mat-icon>
+        <mat-icon [ngStyle]="{color: reservation.ranking > 3 ? 'yellow' : 'grey'}">star</mat-icon>
+        <mat-icon [ngStyle]="{color: reservation.ranking > 4 ? 'yellow' : 'grey'}">star</mat-icon>
+        <mat-icon [ngStyle]="{color: reservation.ranking > 5 ? 'yellow' : 'grey'}">star</mat-icon>
       </div>      
   </mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="1">
-      <div>
-        <mat-icon [ngStyle] = "{color: reservation.youLikeIt ? 'red' : 'grey'}"
-          (click) = modifyFavorite()>favorite_border</mat-icon>
-      </div>
+  <mat-grid-tile [colspan]="1" [rowspan]="1" [style.background]="'lightgray'">
+    <button mat-button [style.color] = "reservation.youLikeIt ? 'red' : 'grey'"
+      (click) = "modifyFavorite()"><mat-icon>favorite_border</mat-icon></button>
   </mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="1">
+  <mat-grid-tile [colspan]="1" [rowspan]="1" [style.background]="'lightgray'">
     <button mat-raised-button *ngIf="userId == reservation.createdByUser.id"
-      color="warn">Edit
+      color="warn" (click) = "editReservation(reservation.id)">Edit
     </button>
   </mat-grid-tile>
 
-  <mat-grid-tile [colspan]="1" [rowspan]="1"></mat-grid-tile>  
-</mat-grid-list> -->
+  <mat-grid-tile  *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile>  
+</mat-grid-list>

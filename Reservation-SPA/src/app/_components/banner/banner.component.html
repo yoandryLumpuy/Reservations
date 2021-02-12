@@ -3,9 +3,9 @@
              structure.middleText != '' || 
              structure.navigationButtonText != ''">
   
-  <ng-template *ngIf="!inSmallScreen">
+  <ng-container *ngIf="!inSmallScreen">
     <mat-grid-tile [colspan] = "1" [rowspan] = "1"></mat-grid-tile> 
-  </ng-template>           
+  </ng-container>           
   
   <mat-grid-tile [colspan] = "1" [rowspan] = "1">
      <h1>{{structure.leftText}}</h1> 
@@ -20,7 +20,7 @@
     <button mat-stroked-button>{{structure.navigationButtonText}}</button>
   </mat-grid-tile> 
   
-  <ng-template *ngIf="!inSmallScreen">
+  <ng-container *ngIf="!inSmallScreen">
     <mat-grid-tile [colspan] = "1" [rowspan] = "1"></mat-grid-tile> 
-  </ng-template>  
+  </ng-container>  
 </mat-grid-list>

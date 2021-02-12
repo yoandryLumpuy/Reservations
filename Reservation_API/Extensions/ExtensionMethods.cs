@@ -43,6 +43,16 @@ namespace Reservation_API.Extensions
             return dbSetContacts.Include(c => c);             
         } 
 
+        public static IIncludableQueryable<Contact, object> EagerLoadRelatedObjectsForCascadeElimination(
+                        this DbSet<Contact> dbSetContacts, bool includeRelated = true){
+            if (includeRelated)
+               return dbSetContacts.Include(c => c.ContactType)
+                         .Include(c => c.CreatedByUser)
+                         .Include(c => c.Reservations);
+
+            return dbSetContacts.Include(c => c);             
+        } 
+
         public static IIncludableQueryable<Reservation, object> EagerLoadRelatedObjects(this DbSet<Reservation> dbSetReservations, bool includeRelated = true){
             if (includeRelated)
                return dbSetReservations

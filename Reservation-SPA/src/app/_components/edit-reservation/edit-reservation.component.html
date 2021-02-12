@@ -9,11 +9,10 @@
         <input type="text"
             matInput
             [formControl] = "contactName"
-            [matAutocomplete]="auto"
-            (change) = "onContactNameChange($event)">
+            [matAutocomplete]="auto">
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-          <mat-option *ngFor="let option of contacts" [value]="option.name">
-            {{option.name}}
+          <mat-option *ngFor="let contactNameOption of filteredOptions | async" [value]="contactNameOption">
+            {{contactNameOption}}
           </mat-option>
         </mat-autocomplete> 
         <div *ngIf="contactName.touched && contactName.errors">
@@ -62,26 +61,34 @@
     </mat-grid-tile>
 
     <mat-grid-tile [colspan]="1" [rowspan]="1" [style.background]="'lightgray'">
-      <button (click) = toggleContactList()>{{showContactList ? 'Hide list' : 'Show list'}}</button>
-      <button style="margin-left: 2px;">Edit</button>
+      <button mat-raised-button type="button" 
+          #ListContactsButton 
+          matTooltip = "{{showContactList ? 'Hide list of contacts!' : 'Show list of contacts!'}}"
+          (click) = toggleContactList()>{{showContactList ? 'Hide list' : 'Show list'}}</button>
+      <button mat-raised-button type="button" 
+          #EditContactButton
+          matTooltip = "Edit existing contact!"
+          (click) = editContact(contactName.value) style="margin-left: 5px;">Edit</button>
     </mat-grid-tile>
 
     <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile> 
     <!-- --------------------- -->
     
     <!-- List of contacts that can be shown if not in small screen -->
-    <mat-grid-tile [colspan]="1" [rowspan]="5" *ngIf="!inSmallScreen && showContactList"></mat-grid-tile>     
-    <mat-grid-tile [colspan]="5" [rowspan]="5" *ngIf="!inSmallScreen && showContactList">     
-      <app-contact-list></app-contact-list>
+    <mat-grid-tile [colspan]="1" [rowspan]="7" *ngIf="!inSmallScreen && showContactList"></mat-grid-tile>     
+    <mat-grid-tile [colspan]="5" [rowspan]="7" *ngIf="!inSmallScreen && showContactList">  
+      <div style="width: 100%; height: 100%;">
+        <app-contact-list></app-contact-list>
+      </div>               
     </mat-grid-tile>     
-    <mat-grid-tile [colspan]="1" [rowspan]="5" *ngIf="!inSmallScreen && showContactList"></mat-grid-tile> 
+    <mat-grid-tile [colspan]="1" [rowspan]="7" *ngIf="!inSmallScreen && showContactList"></mat-grid-tile> 
     <!-- --------------- -->
 
     <!-- render button to submit the form -->
     <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile>
     <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="4" [rowspan]="1" [style.background]="'lightgray'"></mat-grid-tile>
     <mat-grid-tile [colspan]="1" [rowspan]="1" [style.background]="'lightgray'">
-      <button mat-raised-button type = "submit" [disabled] = "form.touched && form.invalid"
+      <button mat-raised-button type = "button" [disabled] = "form.touched && form.invalid"
         > {{isEditingReservation ? 'Update' : 'Insert'}} </button>
     </mat-grid-tile>
     <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile>
