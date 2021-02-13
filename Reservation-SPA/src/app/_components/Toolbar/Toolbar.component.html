@@ -14,7 +14,7 @@
 
             <span class="example-spacer"></span>
 
-            <button mat-icon-button [matMenuTriggerFor] = "menu" *ngIf="!!(authService.user | async)">
+            <button mat-icon-button [matMenuTriggerFor] = "menu" *ngIf="!!(authService.user | async) && (authService.user | async)?.id != 0">
               <mat-icon>more_vert</mat-icon>
             </button> 
         </mat-grid-tile>

@@ -191,10 +191,13 @@ namespace Reservation_API.Persistence
             return await _reservationDbContext.ContactTypes.ToListAsync();
         }
 
-        public async Task<bool> DeleteContactAsync(int contactId)
+        public async Task<ResultDeleteContact> DeleteContactAsync(int invokingUserId, int contactId)
         {
             var contact = await GetContactAsync(contactId, forElimination: true);            
             if (contact != null) {  
+                if (invokingUserId != contact.CreatedByUser.Id)
+                    return ResultDeleteContact.NotAuthorized;
+
                 foreach(var r in contact.Reservations){
                    var userLikes 
                         = await _reservationDbContext.UserLikesReservations
@@ -202,11 +205,11 @@ namespace Reservation_API.Persistence
                    _reservationDbContext.UserLikesReservations.RemoveRange(userLikes);
                 }              
                 _reservationDbContext.Contacts.Remove(contact);
-                await _unitOfWork.CompleteAsync();
-                return true;
+                await _unitOfWork.CompleteAsync();                
+                return ResultDeleteContact.Successful;
             }
 
-            return false;
+            return ResultDeleteContact.NotFound;
         }
 
         public async Task<Contact> GetContactByNameAsync(string contactName)

@@ -6,6 +6,7 @@ import { BannerStructureService } from 'src/app/_services/banner-structure.servi
 import { BreakpointObserverService } from 'src/app/_services/breakpoint-observer.service';
 import { EditReservationComponent } from '../edit-reservation/edit-reservation.component';
 import { AlertService } from 'src/app/_services/alert.service';
+import { ReservationListComponent } from '../reservation-list/reservation-list.component';
 
 @Component({
   selector: 'app-Toolbar',
@@ -28,7 +29,7 @@ export class ToolbarComponent implements OnInit {
   }
 
   get instanceOfReservationList(){
-    return this.structure?.emittedBy instanceof EditReservationComponent;
+    return this.structure?.emittedBy instanceof ReservationListComponent;
   }
   
   ngOnDestroy(): void {

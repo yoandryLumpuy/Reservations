@@ -11,7 +11,7 @@
 
   <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1" [style.background]="'lightgray'">      
       <div>
-        <mat-icon [ngStyle]="{color: reservation.ranking > 1 ? 'yellow' : 'grey'}">star</mat-icon>
+        <mat-icon [ngStyle]="{color: reservation.ranking > 0 ? 'yellow' : 'grey'}">star</mat-icon>
         <mat-icon [ngStyle]="{color: reservation.ranking > 2 ? 'yellow' : 'grey'}">star</mat-icon>
         <mat-icon [ngStyle]="{color: reservation.ranking > 3 ? 'yellow' : 'grey'}">star</mat-icon>
         <mat-icon [ngStyle]="{color: reservation.ranking > 4 ? 'yellow' : 'grey'}">star</mat-icon>

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Reservation_API.Core.Model;
 using Reservation_API.DataTransferObjects;
+using Reservation_API.Extensions;
 
 namespace Reservation_API.Persistence
 {
@@ -26,7 +27,7 @@ namespace Reservation_API.Persistence
         Task<PaginationResult<Contact>> GetContactsAsync(QueryObject queryObject);
         Task<List<Contact>> GetAllContactsAsync();
         Task<List<ContactType>> GetAllContactTypesAsync();
-        Task<bool> DeleteContactAsync(int contactId);
+        Task<ResultDeleteContact> DeleteContactAsync(int invokingUserId, int contactId);
 
     }
 }

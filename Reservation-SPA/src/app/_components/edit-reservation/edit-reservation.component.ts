@@ -1,4 +1,4 @@
-import { defaultBannerStructure, PhonePlaceHolder } from './../../_model/Constants';
+import { defaultBannerStructure, PhonePlaceHolder, NavigateToReservationList } from './../../_model/Constants';
 import { BreakpointObserverService } from './../../_services/breakpoint-observer.service';
 import { Reservation } from './../../_model/reservation.interface';
 import { User } from './../../_model/user.interface';
@@ -12,7 +12,7 @@ import { forkJoin, Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { map, startWith, switchMap} from 'rxjs/operators';
 import { PhonePattern } from 'src/app/_model/Constants';
 import { ContactType } from 'src/app/_model/ContactType.interface';
-import { ReservationForModifications } from 'src/app/_model/ReservationForModifications.interface';
+import { defaultReservationForModifications, ReservationForModifications } from 'src/app/_model/ReservationForModifications.interface';
 import { AlertService } from 'src/app/_services/alert.service';
 import { ContactService } from 'src/app/_services/Contact.service';
 import { BannerStructureService } from 'src/app/_services/banner-structure.service';
@@ -31,13 +31,13 @@ export class EditReservationComponent implements OnInit {
 
   phonePlaceHolder = PhonePlaceHolder;
 
-  model: ReservationForModifications;
+  model: ReservationForModifications = defaultReservationForModifications;
   isEditingReservation = false; 
-  reservationId: any;
+  reservationId: any = 0;
   showContactList = false;
   inSmallScreen = false;
 
-  filteredOptions = new BehaviorSubject<string[]>([]);
+  filteredOptions : Observable<string[]>;
 
   @ViewChild('EditContactButton') editContactButton: MatButton;  
 
@@ -84,29 +84,33 @@ export class EditReservationComponent implements OnInit {
     this.fillForm();
     this.updateBanner();
 
-    this.contactName.valueChanges.subscribe(value =>{
+    this.filteredOptions = this.contactName.valueChanges.pipe(
       startWith(''),
-      value = this.filter(value);
-      this.filteredOptions.next(value);
+      map(value => this.filter(value))
+    ); 
 
+    this.contactName.valueChanges.subscribe(value =>{
       var user : User;
       this.authService.user.pipe(
         switchMap(u => {
            user = u; 
            return this.contactService.getContactByName(value);
         }))
-        .subscribe(c =>{  
-          this.includeContactToSourceLists(c);            
+        .subscribe(c =>{                        
           this.fillContactData(c);
           this.disableContactEdition(user.id !== c.createdByUser.id);         
         },
         (error) => {});
     });
+
+    this.breakpointObserverService.inSmallScreen.subscribe(res =>
+      this.inSmallScreen = res);
   }
 
   private filter(value: string): string[] {
     const filterValue = value.toLowerCase();
-    return this.contacts.filter(option => option.name.toLowerCase().indexOf(filterValue) !== -1)
+    return this.contacts
+           .filter(option => option.name.toLowerCase().indexOf(filterValue) !== -1)
            .map(c => c.name);
   }
 
@@ -127,9 +131,6 @@ export class EditReservationComponent implements OnInit {
             this.router.navigate(['']);
         }
     });
-
-    this.breakpointObserverService.inSmallScreen.subscribe(res =>
-      this.inSmallScreen = res);
   }
 
   fillForm(){
@@ -149,12 +150,11 @@ export class EditReservationComponent implements OnInit {
         (error) => {}); 
   }
 
-  fillContactData(c : Contact){ 
+  fillContactData(c : Contact, considerName? : boolean){ 
     //set values in the form
     var values = this.form.value;
     this.form.setValue({
-      ...values,
-      contactName: c.name,    
+      ...values,      
       contactTypeId: c.contactType.id,
       phone: c.phone,
       birthDate: c.birthDate
@@ -167,7 +167,7 @@ export class EditReservationComponent implements OnInit {
       leftText: (this.isEditingReservation ? 'Update ' : 'Create ') + 'Reservation',
       middleText : 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.' 
            + 'Nemo odio cum voluptatibus sapiente deleniti magni, officia et ab minus blanditiis.',
-      navigationButtonText: 'Reservation List',
+      navigationButtonText: NavigateToReservationList,
       emittedBy: this
     });
   }
@@ -181,24 +181,10 @@ export class EditReservationComponent implements OnInit {
       contactTypeId: r.contact.contactType.id,
       phone: r.contact.phone,
       birthDate: r.contact.birthDate
-    })
-  }
+    });
 
-  includeContactToSourceLists(c : Contact){
-    //update souce list for mat-autocomplete component 
-    var index = this.contacts.findIndex(c => c.id == c.id);    
-    if (index != -1)
-      this.contacts.splice(index, 1, c);
-    else
-      this.contacts.push(c); 
-
-    //update souce list for the mat-select component in contactTypes edition
-    index = this.contactTypes.findIndex(ct => ct.id == c.contactType.id);    
-    if (index != -1)
-      this.contactTypes.splice(index, 1, c.contactType);
-    else 
-      this.contactTypes.push(c.contactType);
-  }
+    this.model.id = r.id;
+  }  
 
   disableContactEdition(disable : boolean){
     if (disable){
@@ -220,6 +206,7 @@ export class EditReservationComponent implements OnInit {
     this.reservationService.postReservation(this.model)
       .subscribe(res => {
           this.alertService.success(`Reservation successfully ${this.isEditingReservation ? 'updated' : 'created'}`);
+          this.router.navigate(['reservations']);
       });
   }
 
@@ -232,5 +219,9 @@ export class EditReservationComponent implements OnInit {
     .subscribe(c => {
       this.router.navigate(['contacts', c.id, 'edit']);
     });    
+  }
+
+  addContact(){
+    this.router.navigate(['contacts/new']);
   }
 }

@@ -1,10 +1,10 @@
 <mat-grid-list [cols]="inSmallScreen ? '1' : '6'" 
-      *ngIf="structure.leftText != '' || 
-             structure.middleText != '' || 
-             structure.navigationButtonText != ''">
+      *ngIf="structure.emittedBy != null && structure.emittedBy != undefined" 
+    rowHeight="100px"
+    [style.background]="'lightgray'">
   
   <ng-container *ngIf="!inSmallScreen">
-    <mat-grid-tile [colspan] = "1" [rowspan] = "1"></mat-grid-tile> 
+    <mat-grid-tile [colspan] = "1" [rowspan] = "1" ></mat-grid-tile> 
   </ng-container>           
   
   <mat-grid-tile [colspan] = "1" [rowspan] = "1">
@@ -17,7 +17,9 @@
   </mat-grid-tile>
 
   <mat-grid-tile *ngIf="!inSmallScreen" [colspan] = "1" [rowspan] = "1">    
-    <button mat-stroked-button>{{structure.navigationButtonText}}</button>
+    <button mat-stroked-button 
+       [routerLink]="instanceOfReservationList ? ['reservations', 'new'] : ['reservations']">
+       {{structure.navigationButtonText}}</button>
   </mat-grid-tile> 
   
   <ng-container *ngIf="!inSmallScreen">

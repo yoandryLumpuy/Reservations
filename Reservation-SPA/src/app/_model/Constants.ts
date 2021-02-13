@@ -15,3 +15,6 @@ export const defaultBannerStructure : BannerStructure = {
     navigationButtonText: '',
     emittedBy: null
   }
+
+  export const NavigateToReservationList : string = 'Reservation List';
+  export const NavigateToCreateReservation : string = 'Create Reservation';

@@ -6,6 +6,7 @@ import { environment } from './../../environments/environment';
 import {switchMap, tap} from 'rxjs/operators';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
+import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class AuthService {
   user: BehaviorSubject<User> = new BehaviorSubject<User>(defaultUser);
   timeoutTimer : any;
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private alertService: AlertService) {    
+  }
 
   get loggedIn() : boolean{
     var token = localStorage.getItem('token');

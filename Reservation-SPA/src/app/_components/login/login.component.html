@@ -32,11 +32,16 @@
     </mat-grid-tile>
 
     <mat-grid-tile [colspan]="1" [rowspan]="1">
-      <button mat-raised-button type="submit" color= "primary" *ngIf= "!(authService.user | async)"
+      <button mat-raised-button type="submit" color= "primary" 
+        *ngIf= "!(authService.user | async) || (authService.user | async)?.id == 0"
         [disabled] = "form.touched && form.invalid"> Login </button>
-      <button mat-raised-button type="button" (click) = "register()" color = "warn" *ngIf= "!(authService.user | async)"
+
+      <button mat-raised-button type="button" (click) = "register()" color = "warn" 
+        *ngIf= "!(authService.user | async) || (authService.user | async)?.id == 0"
         [disabled] = "form.touched && form.invalid"> Register </button>
-      <button mat-raised-button type="button" (click) = "logout()" *ngIf= "!!(authService.user | async)">
+
+      <button mat-raised-button type="button" (click) = "logout()" 
+        *ngIf= "!!(authService.user | async) && (authService.user | async)?.id != 0">
         <mat-icon>logout</mat-icon> Logout </button>
     </mat-grid-tile> 
   </mat-grid-list>

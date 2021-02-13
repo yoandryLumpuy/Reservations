@@ -1,9 +1,37 @@
-<!-- <mat-list>
-    <mat-list-item *ngFor="let reservation of paginationResult.items">
-        <app-reservation-list-item [reservation] = "reservation"></app-reservation-list-item>
-    </mat-list-item>
-</mat-list> -->
+<!-- sorting selector element incorporated -->
+<mat-grid-list [cols]="inSmallScreen ? '1' : '6'" rowHeight="100px" gutterSize="0"> 
+    <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile>
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-form-field appearance="outline">
+            <mat-label>Sort By</mat-label>
+            <mat-select [formControl] = "selectSortOption">
+              <mat-option *ngFor="let sortOption of sortOptions" [value]="sortOption">
+                {{sortOption.title}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>        
+    </mat-grid-tile>
+    <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="4" [rowspan]="1"></mat-grid-tile>
+</mat-grid-list>
 
+<!-- render the different reservations -->
 <ng-container *ngFor="let r of paginationResult.items">
     <app-reservation-list-item [reservation] = "r"></app-reservation-list-item>
 </ng-container>
+
+
+<mat-grid-list [cols]="inSmallScreen ? '1' : '6'" rowHeight="100px" gutterSize="0"> 
+    <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile>
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+        
+        <mat-paginator style="margin: auto;"
+          [length] = "paginationResult.totalItems"
+          [pageSize] = "paginationResult.pageSize"
+          [pageSizeOptions] = "[5, 10, 15, 20]"
+          [pageIndex] = "paginationResult.page"
+          (page) = "onPageChanged($event)"
+        ></mat-paginator>
+
+    </mat-grid-tile>
+    <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="4" [rowspan]="1"></mat-grid-tile>
+</mat-grid-list>

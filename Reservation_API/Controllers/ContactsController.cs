@@ -107,8 +107,14 @@ namespace Reservation_API.Controllers
         [HttpDelete("{contactId}", Name = "DeleteContact")]
         public async Task<IActionResult> DeleteContact(int contactId)
         {
-            var successfullyDeleted =  await _repository.DeleteContactAsync(contactId);
-            if (!successfullyDeleted) return BadRequest("Contact not found!");
+            var invokingUserId = int.Parse(User.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+
+            var result =  await _repository.DeleteContactAsync(invokingUserId, contactId);
+            
+            if (result == ResultDeleteContact.NotFound) 
+                return BadRequest("Contact not found!");
+            else if (result == ResultDeleteContact.NotAuthorized)
+                return BadRequest("You doesn't created this contact. You can't delete it!");
             
             return Ok(contactId);
         }

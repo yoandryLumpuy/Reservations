@@ -1,3 +1,4 @@
+import { CkeditorComponent } from './_components/ckeditor/ckeditor.component';
 import { BannerComponent } from './_components/banner/banner.component';
 import { ContactListComponent } from './_components/contact-list/contact-list.component';
 import { ReservationListComponent } from './_components/reservation-list/reservation-list.component';
@@ -26,6 +27,7 @@ import { EditReservationComponent } from './_components/edit-reservation/edit-re
 import { EditContactComponent } from './_components/edit-contact/edit-contact.component';
 import { LoginComponent } from './_components/login/login.component';
 import { ReservationListItemComponent } from './_components/reservation-list-item/reservation-list-item.component';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 @NgModule({
   declarations: [					
@@ -42,7 +44,8 @@ import { ReservationListItemComponent } from './_components/reservation-list-ite
       EditContactComponent,
       LoginComponent,      
       ContactListComponent,
-      BannerComponent
+      BannerComponent,
+      CkeditorComponent
    ],
   imports: [
     BrowserModule, 
@@ -52,7 +55,8 @@ import { ReservationListItemComponent } from './_components/reservation-list-ite
     BrowserAnimationsModule,
     appRoutingModule,
     MatModule, 
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CKEditorModule
   ],
   providers: [
     {provide: ErrorHandler, useClass: MyErrorHandler},

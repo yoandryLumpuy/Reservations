@@ -69,6 +69,9 @@
           #EditContactButton
           matTooltip = "Edit existing contact!"
           (click) = editContact(contactName.value) style="margin-left: 5px;">Edit</button>
+      <button mat-raised-button type="button" 
+          matTooltip = "Add a contact!"
+          (click) = addContact() style="margin-left: 5px;">Add</button>
     </mat-grid-tile>
 
     <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile> 
@@ -84,11 +87,23 @@
     <mat-grid-tile [colspan]="1" [rowspan]="7" *ngIf="!inSmallScreen && showContactList"></mat-grid-tile> 
     <!-- --------------- -->
 
+     <!-- /////////////////////////////////////////////// -->
+    <!-- CKEditor rich text editor for description  -->
+    <!-- <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="5"></mat-grid-tile>     
+    <mat-grid-tile [colspan]="inSmallScreen ? 1 : 5" [rowspan]="5">  
+      <div style="width: 100%; height: 100%;">
+        <app-ckeditor></app-ckeditor>
+      </div>               
+    </mat-grid-tile>     
+    <mat-grid-tile  *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="5"></mat-grid-tile>   -->
+    <!-- --------------- -->
+
+
     <!-- render button to submit the form -->
     <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile>
     <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="4" [rowspan]="1" [style.background]="'lightgray'"></mat-grid-tile>
     <mat-grid-tile [colspan]="1" [rowspan]="1" [style.background]="'lightgray'">
-      <button mat-raised-button type = "button" [disabled] = "form.touched && form.invalid"
+      <button mat-raised-button type = "submit" [disabled] = "form.touched && form.invalid"
         > {{isEditingReservation ? 'Update' : 'Insert'}} </button>
     </mat-grid-tile>
     <mat-grid-tile *ngIf="!inSmallScreen" [colspan]="1" [rowspan]="1"></mat-grid-tile>

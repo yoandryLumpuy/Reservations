@@ -94,11 +94,24 @@ export class EditContactComponent implements OnInit, OnDestroy {
       switchMap(res =>
         {
            this.isEditing = res.get('id') != null;    
-           if (this.isEditing) 
-            this.contactId = res.get('id'); 
+           if (this.isEditing) {
+              this.contactId = res.get('id'); 
+              this.bannerStructureService.updateBanner({
+                ...defaultBannerStructure,
+                emittedBy: this,
+                leftText: 'Edit Contact',
+                navigationButtonText: 'Reservations List'
+              });
+           }
            else {
-            this.contactName.setAsyncValidators(this.contactAlreadyExist.bind(this));    
-            this.contactName.updateValueAndValidity();
+              this.contactName.setAsyncValidators(this.contactAlreadyExist.bind(this));    
+              this.contactName.updateValueAndValidity();
+              this.bannerStructureService.updateBanner({
+                ...defaultBannerStructure,
+                emittedBy: this,
+                leftText: 'Create Contact',
+                navigationButtonText: 'Reservations List'
+              });
            }          
 
            return this.contactService.getContactById(parseInt(this.contactId));        
@@ -106,10 +119,6 @@ export class EditContactComponent implements OnInit, OnDestroy {
       )
       .subscribe(contact => this.fillContactData(contact),
       (error) => {});
-
-      this.bannerStructureService.updateBanner({
-        ...defaultBannerStructure
-      }); 
   }
 
   fillContactData(c : Contact){ 

@@ -15,4 +15,6 @@
         public const string SortByCreatedDateTime = "CreatedDateTime";
         public const string SortByRanking = "Ranking";
     }
+
+    public enum ResultDeleteContact {Successful = 0, NotFound = 1, NotAuthorized = 2};
 }

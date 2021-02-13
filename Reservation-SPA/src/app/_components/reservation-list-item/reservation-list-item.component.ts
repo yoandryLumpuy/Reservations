@@ -6,12 +6,6 @@ import { Reservation } from './../../_model/reservation.interface';
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { ReservationService } from 'src/app/_services/Reservation.service';
 
-interface SortOptions 
-{
-  title: string; 
-  sortByKey: string;
-  isSortAscending: boolean
-}
 
 @Component({
   selector: 'app-reservation-list-item',
@@ -24,16 +18,6 @@ export class ReservationListItemComponent implements OnInit, OnDestroy {
   subscriptionToBreakpointObserverService : Subscription;  
   userId: number;
   inSmallScreen = false;
-
-  SortByContactName = "ContactName";
-  SortByCreatedDateTime = "CreatedDateTime";
-  SortByRanking = "Ranking";
-
-  sortOptions : SortOptions[] = [{title: "By Date Ascending", sortByKey: this.SortByCreatedDateTime, isSortAscending: true}, 
-          {title: "By Date Descending", sortByKey: this.SortByCreatedDateTime, isSortAscending: false},
-          {title: "By Alphabetic Ascending", sortByKey: this.SortByContactName, isSortAscending: true},
-          {title: "By Alphabetic Descending", sortByKey: this.SortByContactName, isSortAscending: false},
-          {title: "By Ranking", sortByKey: this.SortByRanking, isSortAscending: false}];
 
   constructor(private reservationService: ReservationService,
     private authService: AuthService,
